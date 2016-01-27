@@ -5,8 +5,6 @@
 		<h1>Pages</h1>
 	</div>
 
-	<alert-notification></alert-notification>
-
 	<!-- Service Loading -->
 	<div class="alert alert-default" v-if="serviceLoading">Loading ...</div>
 	
@@ -49,7 +47,6 @@
 <script>
 	import { Isotope, IsotopeItem } from 'vue-isotope'
 	import appStore from 'themekit-docs/src/js/app.store'
-	import { AlertNotification } from 'themekit-vue'
 	import Store from 'themekit-docs/src/mixins/store'
 	import crop from 'mout/string/crop'
 
@@ -113,8 +110,7 @@
 		},
 		components: {
 			Isotope,
-			IsotopeItem,
-			AlertNotification
+			IsotopeItem
 		}
 	}
 </script>

@@ -1,7 +1,5 @@
 <template>
 
-	<alert-notification fixed></alert-notification>
-
 	<!-- Loading -->
 	<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
 	
@@ -52,7 +50,7 @@
 	import appStore from 'themekit-docs/src/js/app.store'
 	import { AlertNotification } from 'themekit-vue'
 	import Store from 'themekit-docs/src/mixins/store'
-	import Validation from 'themekit-docs/src/mixins/validation'
+	import Validation from 'vue-validator-util'
 	import { MarkdownEditor } from 'vue-markdown-editor'
 	
 	export default {
@@ -120,7 +118,6 @@
 			}
 		},
 		components: {
-			AlertNotification,
 			MarkdownEditor
 		}
 	}

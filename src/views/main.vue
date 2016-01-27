@@ -1,4 +1,6 @@
 <template>
+
+	<alert-notification fixed></alert-notification>
 	
 	<!-- Layout -->
 	<layout-transition>
@@ -16,15 +18,20 @@
 				icon="fa fa-bars">
 			</sidebar-toggle-button>
 
-			<div class="navbar-form navbar-left">
-				<algolia-instantsearch-dropdown
-					:algolia-app-id="appConfig.algolia.appId"
-					:algolia-api-key="appConfig.algolia.apiKey"
-					algolia-index="components"
-					:transform-hit="transformHit"
-					search-box-placeholder="Search components ...">
-				</algolia-instantsearch-dropdown>
-			</div>
+			<template v-if="user.getAuth()">
+				<div class="navbar-form navbar-left">
+					<algolia-instantsearch-dropdown
+						:algolia-app-id="appConfig.algolia.appId"
+						:algolia-api-key="appConfig.algolia.apiKey"
+						algolia-index="components"
+						:transform-hit="transformHit"
+						search-box-placeholder="Search components ...">
+					</algolia-instantsearch-dropdown>
+				</div>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a v-link="'logout'">Logout</a></li>
+				</ul>
+			</template>
 		</navbar>
 		<!-- // END Navbar -->
 
@@ -64,11 +71,15 @@
 </template>
 
 <script>
+	import { AlertNotification } from 'themekit-vue'
 	import appStore from 'themekit-docs/src/js/app.store'
 	import { AlgoliaInstantsearchDropdown } from 'vue-algolia'
 	import { LayoutTransition, SidebarTransition } from 'themekit-vue'
 	import { SidebarMenu, SidebarCollapseItem } from 'themekit-vue'
 	import { Navbar, SidebarToggleButton } from 'themekit-vue'
+
+	import user from 'vue-firebase-auth/lib/user'
+	user.setRef(appStore.config.storeFirebaseRef)
 
 	export default {
 		replace: false,
@@ -76,7 +87,8 @@
 			return {
 				packages: [],
 				appConfig: appStore.config,
-				appHelpers: appStore.helpers
+				appHelpers: appStore.helpers,
+				user: user
 			}
 		},
 		computed: {
@@ -107,7 +119,8 @@
 			SidebarCollapseItem,
 			Navbar,
 			SidebarToggleButton,
-			AlgoliaInstantsearchDropdown
+			AlgoliaInstantsearchDropdown,
+			AlertNotification
 		}
 	}
 </script>

@@ -5,8 +5,6 @@
 		<h1>Packages</h1>
 	</div>
 
-	<alert-notification></alert-notification>
-
 	<!-- Service Loading -->
 	<div class="alert alert-default" v-if="serviceLoading">Loading ...</div>
 
@@ -42,9 +40,8 @@
 
 <script>
 	import { Isotope, IsotopeItem } from 'vue-isotope'
-	import { AlertNotification } from 'themekit-vue'
 	import Store from 'themekit-docs/src/mixins/store'
-	import Validation from 'themekit-docs/src/mixins/validation'
+	import Validation from 'vue-validator-util'
 	import appStore from 'themekit-docs/src/js/app.store'
 
 	export default {
@@ -84,8 +81,7 @@
 		},
 		components: {
 			Isotope,
-			IsotopeItem,
-			AlertNotification
+			IsotopeItem
 		}
 	}
 </script>

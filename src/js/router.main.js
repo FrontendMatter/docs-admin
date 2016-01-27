@@ -7,7 +7,23 @@ var router = new VueRouter({
 	linkActiveClass: 'active'
 })
 
+import appStore from 'themekit-docs/src/js/app.store'
+import user from 'vue-firebase-auth/lib/user'
+user.setRef(appStore.config.storeFirebaseRef)
+
 router.map({
+	'/auth': {
+		name: 'auth',
+		component: function (resolve) {
+			require(['../views/auth'], resolve)
+		}
+	},
+	'/logout': {
+		name: 'logout',
+		component: function (resolve) {
+			require(['../views/logout'], resolve)
+		}
+	},
 	'/packages': {
 		name: 'packages',
 		component: function (resolve) {
@@ -64,8 +80,19 @@ router.map({
 	}
 })
 
-router.beforeEach(function () {
-	window.scrollTo(0, 0)
+router.beforeEach(({ to, next }) => {
+	const auth = user.getAuth()
+
+	if (to.name !== 'auth' && !auth) {
+		router.go('auth')
+	}
+	else if (to.name === 'auth' && auth) {
+		router.go('packages')
+	}
+	else {
+		next()
+		window.scrollTo(0, 0)
+	}
 })
 
 router.redirect({

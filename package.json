@@ -43,6 +43,7 @@
     "url-loader": "^0.5.7",
     "vue": "^1.0.15",
     "vue-algolia": "^0.1.0",
+    "vue-firebase-auth": "^0.1.0",
     "vue-hot-reload-api": "^1.2.2",
     "vue-html-loader": "^1.0.0",
     "vue-isotope": "^0.1.0",
