@@ -1,9 +1,0 @@
-{
-  "name": "themekit-docs-admin",
-  "description": "ThemeKit Docs Admin App.",
-  "license": "ISC",
-  "private": true,
-  "dependencies": {
-    "modernizr": "~2.8.3"
-  }
-}
