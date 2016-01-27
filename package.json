@@ -37,7 +37,7 @@
     "sass-loader": "^3.1.2",
     "style-import-loader": "^0.2.0",
     "style-loader": "^0.13.0",
-    "themekit-docs-store": "^1.0.1",
+    "themekit-docs-store": "^1.0.2",
     "themekit-vue": "github:themekit/themekit-vue",
     "themekit-webpack-config": "^1.0.1",
     "url-loader": "^0.5.7",
@@ -51,6 +51,7 @@
     "vue-router": "^0.7.8",
     "vue-style-loader": "^1.0.0",
     "vue-validator": "^2.0.0-alpha.15",
+    "vue-validator-util": "^0.1.1",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   }
