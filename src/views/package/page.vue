@@ -3,7 +3,7 @@
 	<!-- Loading -->
 	<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
 	
-	<template v-if="!serviceLoading && (!isEditView || model.title)">
+	<template v-if="!serviceLoading">
 
 		<!-- Main form -->
 		<form @submit.prevent="create">

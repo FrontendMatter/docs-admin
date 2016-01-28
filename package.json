@@ -51,8 +51,8 @@
     "vue-markdown-editor": "^0.1.2",
     "vue-router": "^0.7.8",
     "vue-style-loader": "^1.0.0",
-    "vue-validator": "^2.0.0-alpha.15",
-    "vue-validator-util": "^0.1.1",
+    "vue-validator": "^2.0.0-alpha.16",
+    "vue-validator-util": "^0.2.2",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   }

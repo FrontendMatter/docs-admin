@@ -3,7 +3,7 @@
 	<!-- Loading -->
 	<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
 	
-	<template v-if="!serviceLoading && (!isEditView || model.name)">
+	<template v-if="!serviceLoading">
 
 		<!-- Main form -->
 		<validator name="validation">
@@ -50,27 +50,25 @@
 					v-for="(key, prop) in model.props">
 
 					<!-- Editable property -->
-					<validator 
-						v-if="isEditable('props.' + key)"
-						:name="'prop-validation-' + key">
-						<div class="form-group form-group-prop" 
-							:class="{ 'has-error': hasValidationError('description', '$prop-validation-' + key) }">
-							<h3 id="prop-{{ key }}">{{ prop.name }}</h3>
-							<label for="prop-{{ key }}-description">Description</label>
-							<textarea id="prop-{{ key }}-description"
-								class="form-control" 
-								v-model="model.props[ key ].description" 
-								v-validate:description="{ required: { rule: true, message: 'The property description is required' } }">
-							</textarea>
-							<p class="help-block" v-for="msg in validationMessages('description', '$prop-validation-' + key)">{{ msg }}</p>
-							<p class="help-block">
-								<button type="submit" class="btn btn-default">OK</button>
-								<button class="btn btn-default" @click.stop="toggleEditable('props.' + key)">Cancel</button>
-							</p>
-							<pre v-text="component.props[ key ] | json"></pre>
-							<button class="btn btn-link" @click.prevent.stop="removeProperty(key)">Remove</button>
-						</div>
-					</validator>
+					<div class="form-group form-group-prop"
+						v-if="isEditable('props.' + key)" 
+						:class="{ 'has-error': hasValidationError('prop-description-' + key) }">
+						<h3 id="prop-{{ key }}">{{ prop.name }}</h3>
+						<label for="prop-{{ key }}-description">Description</label>
+						<textarea id="prop-{{ key }}-description"
+							class="form-control" 
+							v-model="model.props[ key ].description" 
+							:field="'prop-description-' + key"
+							v-validate="{ required: { rule: true, message: 'The property description is required' } }">
+						</textarea>
+						<p class="help-block" v-for="msg in validationMessages('prop-description-' + key)">{{ msg }}</p>
+						<p class="help-block">
+							<button type="submit" class="btn btn-default">OK</button>
+							<button class="btn btn-default" @click.stop="toggleEditable('props.' + key)">Cancel</button>
+						</p>
+						<pre v-text="component.props[ key ] | json"></pre>
+						<button class="btn btn-link" @click.prevent.stop="removeProperty(key)">Remove</button>
+					</div>
 					<!-- // END Editable property -->
 					
 					<!-- Read-only property -->
@@ -121,24 +119,24 @@
 			<validator name="add-property-validation" slot="body">
 				<form @submit.prevent="submitAddProperty">
 					<div class="form-group" 
-						:class="{ 'has-error': hasValidationError('name', '$add-property-validation') }">
+						:class="{ 'has-error': hasValidationError('name', 'addPropertyValidation') }">
 						<label for="property-name">Property name</label>
 						<input type="text" 
 							class="form-control" 
 							v-model="property.name" 
 							v-validate:name="{ required: { rule: true, message: 'The property name is required' } }"
 							autofocus />
-						<p class="help-block" v-for="msg in validationMessages('name', '$add-property-validation')">{{ msg }}</p>
+						<p class="help-block" v-for="msg in validationMessages('name', 'addPropertyValidation')">{{ msg }}</p>
 					</div>
 					<div class="form-group" 
-						:class="{ 'has-error': hasValidationError('description', '$add-property-validation') }">
+						:class="{ 'has-error': hasValidationError('description', 'addPropertyValidation') }">
 						<label for="property-description">Description</label>
 						<textarea id="property-description"
 							class="form-control" 
 							v-model="property.description" 
 							v-validate:description="{ required: { rule: true, message: 'The property description is required' } }">
 						</textarea>
-						<p class="help-block" v-for="msg in validationMessages('description', '$add-property-validation')">{{ msg }}</p>
+						<p class="help-block" v-for="msg in validationMessages('description', 'addPropertyValidation')">{{ msg }}</p>
 					</div>
 				</form>
 			</validator>
@@ -208,16 +206,7 @@
 				return this.sync ? merge({}, this.sync, this.model) : this.model
 			},
 			valid () {
-				let valid = true
-				forOwn(this.component.props, (prop, key) => {
-					if (this.isEditable('props.' + key)) {
-						if (!valid) {
-							return false
-						}
-						valid = this.getValidator('$prop-validation-' + key).valid
-					}
-				})
-				return this.$validation.valid && valid
+				return this.$validation.valid
 			},
 			packageId () {
 				return this.$route.params.id
@@ -286,7 +275,7 @@
 
 				// validate
 				this.didSubmit = true
-				if (this.getValidator('$add-property-validation').invalid) {
+				if (this.getValidator('add-property-validation').invalid) {
 					return abort('save')
 				}
 
