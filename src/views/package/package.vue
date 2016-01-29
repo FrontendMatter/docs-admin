@@ -88,7 +88,10 @@
 			create () {
 				this.didSubmit = true
 				if (this.valid) {
-					this.store.setPackage(this.model.name, this.model).then(() => {
+					this.store.setPackage(this.packageId, this.model).then((objectId) => {
+						if (!this.model.objectId) {
+							this.model.objectId = objectId
+						}
 						this.didSubmit = false
 						this.success('The package was saved.')
 					})
@@ -98,7 +101,7 @@
 				this.$route.router.go(this.appHelpers.routeToPackages())
 			},
 			goToEditPage () {
-				this.$route.router.go(this.appHelpers.routeToEditPackage(this.model.name))
+				this.$route.router.go(this.appHelpers.routeToEditPackage(this.model.objectId))
 			},
 			cancel () {
 				this.goToPackages()

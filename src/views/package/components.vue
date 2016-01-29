@@ -14,11 +14,11 @@
 			<div class="panel panel-default panel-component">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<button class="close" @click="removeComponent(component.name)">&times;</button>
+						<button class="close" @click="removeComponent(component.objectId)">&times;</button>
 						{{ component.name }}
 					</h4>
 				</div>
-				<div class="panel-body" v-link="appHelpers.routeToEditComponent(packageId, component.name)">
+				<div class="panel-body" v-link="appHelpers.routeToEditComponent(packageId, component.objectId)">
 					<template v-if="component.description">
 						{{ component.description }}
 					</template>
@@ -30,7 +30,7 @@
 					<li class="list-group-item" v-if="component.props">
 						<span class="pull-right">
 							<i class="fa fa-circle text-red-500" v-if="missing(component.props)" :title="missing(component.props)"></i>
-							<i class="fa fa-circle text-orange-500" v-if="outsync(component.name, 'props')"></i>
+							<i class="fa fa-circle text-orange-500" v-if="outsync(component.objectId, 'props')"></i>
 						</span>
 						{{ length(component.props) }} properties 
 					</li>
@@ -71,35 +71,35 @@
 			}
 		},
 		methods: {
-			removeComponent (name) {
+			removeComponent (objectId) {
 				if (confirm('Are you sure you want to remove this component?')) {
-					this.store.removeComponent(name)
+					this.store.removeComponent(objectId)
 				}
 			},
 			onAdded ({ component, sync, merge }) {
 				if (component) {
-					let exists = this.model.find((m) => m.name === component.name)
+					let exists = this.model.find((m) => m.objectId === component.objectId)
 					if (!exists) {
 						this.model.push(component)
 					}
 				}
 				if (sync) {
-					let exists = this.sync.find((s) => s.name === sync.name)
+					let exists = this.sync.find((s) => s.objectId === sync.objectId)
 					if (!exists) {
 						this.sync.push(sync)
 					}
 				}
 				if (merge) {
-					let exists = this.components.find((s) => s.name === merge.name)
+					let exists = this.components.find((s) => s.objectId === merge.objectId)
 					if (!exists) {
 						this.components.push(merge)
 					}
 				}
 			},
-			onRemoved (name) {
+			onRemoved (objectId) {
 				const models = ['model', 'sync', 'components']
 				models.forEach((model) => {
-					this[model] = this[model].filter((m) => m.name !== name)
+					this[model] = this[model].filter((m) => m.objectId !== objectId)
 				})
 			},
 			length (obj) {
@@ -114,18 +114,18 @@
 				})
 				return missing
 			},
-			component (componentName, collection) {
+			component (componentId, collection) {
 				return this[collection].find((c) => {
-					return c.name === componentName
+					return c.objectId === componentId
 				})
 			},
-			outsync (componentName, prop) {
+			outsync (componentId, prop) {
 				let missing = 0
-				let component = this.component(componentName, 'model')
+				let component = this.component(componentId, 'model')
 				if (!component) {
 					return missing
 				}
-				let syncComponent = this.component(componentName, 'sync')
+				let syncComponent = this.component(componentId, 'sync')
 				forOwn(component[prop], (value, key) => {
 					if (syncComponent && typeof syncComponent[prop][key] === 'undefined') {
 						missing++

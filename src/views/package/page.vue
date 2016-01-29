@@ -56,9 +56,9 @@
 
 <script>
 	import appStore from 'themekit-docs/src/js/app.store'
-	import { AlertNotification } from 'themekit-vue'
 	import Store from 'themekit-docs/src/mixins/store'
 	import Validation from 'vue-validator-util'
+	import { AlertNotification } from 'themekit-vue'
 	import { MarkdownEditor } from 'vue-markdown-editor'
 	import slugify from 'mout/string/slugify'
 	
@@ -107,8 +107,10 @@
 				this.didSubmit = true
 				if (this.valid) {
 					this.model.slug = slugify(this.model.title)
-					this.store.setPage(this.model, this.model.pageId).then((pageId) => {
-						this.model.pageId = pageId
+					this.store.setPage(this.pageId, this.model).then((objectId) => {
+						if (!this.model.objectId) {
+							this.model.objectId = objectId
+						}
 						this.didSubmit = false
 						this.success('The page was saved.')
 					})
@@ -118,7 +120,7 @@
 				this.$route.router.go(this.appHelpers.routeToPackagePages(this.packageId))
 			},
 			goToEditPage () {
-				this.$route.router.go(this.appHelpers.routeToEditPage(this.packageId, this.model.pageId))
+				this.$route.router.go(this.appHelpers.routeToEditPage(this.packageId, this.model.objectId))
 			},
 			cancel () {
 				this.goToPackage()

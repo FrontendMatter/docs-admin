@@ -45,9 +45,9 @@
 			<a v-link="appHelpers.routeToPackages()" class="sidebar-brand" slot="brand"><i class="fa fa-fw fa-chevron-left"></i> Packages</a>
 
 			<!-- Package menu -->
-			<template v-if="packageId">
+			<template v-if="pkg">
 				<div class="sidebar-block bg-white">
-					<h4 class="sidebar-category">{{ packageId }}</h4>
+					<h4 class="sidebar-category">{{ pkg.name }}</h4>
 					<a v-link="appHelpers.routeToEditPackage(packageId)">Edit package</a>
 				</div>
 				<sidebar-menu :class="sidebarMenuClass" heading="Package navigation">
@@ -71,8 +71,9 @@
 </template>
 
 <script>
-	import { AlertNotification } from 'themekit-vue'
 	import appStore from 'themekit-docs/src/js/app.store'
+	import Store from 'themekit-docs/src/mixins/store'
+	import { AlertNotification } from 'themekit-vue'
 	import { AlgoliaInstantsearchDropdown } from 'vue-algolia'
 	import { LayoutTransition, SidebarTransition } from 'themekit-vue'
 	import { SidebarMenu, SidebarCollapseItem } from 'themekit-vue'
@@ -83,13 +84,20 @@
 
 	export default {
 		replace: false,
+		mixins: [
+			Store
+		],
 		data () {
 			return {
 				packages: [],
 				appConfig: appStore.config,
 				appHelpers: appStore.helpers,
-				user: user
+				user: user,
+				pkg: null
 			}
+		},
+		route: {
+			canReuse: false
 		},
 		computed: {
 			packageId () {
@@ -104,6 +112,13 @@
 			},
 			isPackageView () {
 				return this.packageId !== undefined
+			}
+		},
+		created () {
+			if (this.packageId) {
+				this.store.getPackage(this.packageId).then((pkg) => {
+					this.pkg = pkg
+				})
 			}
 		},
 		methods: {

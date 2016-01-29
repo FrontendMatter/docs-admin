@@ -4,7 +4,7 @@
   "description": "ThemeKit Docs Admin App.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --config build/webpack.config.dev.js --inline --hot",
+    "dev": "webpack-dev-server --config build/webpack.config.dev.js --inline --hot --port 8081",
     "build": "NODE_ENV=production webpack --config build/webpack.config.production.js --progress",
     "build-dev": "webpack --config build/webpack.config.dev.js --progress"
   },
@@ -52,7 +52,7 @@
     "vue-router": "^0.7.8",
     "vue-style-loader": "^1.0.0",
     "vue-validator": "^2.0.0-alpha.16",
-    "vue-validator-util": "^0.2.2",
+    "vue-validator-util": "^0.3.1",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   }

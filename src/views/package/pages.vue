@@ -14,11 +14,11 @@
 			<div class="panel panel-default panel-page">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<button class="close" @click="removePage(page.pageId)">&times;</button>
+						<button class="close" @click="removePage(page.objectId)">&times;</button>
 						{{ page.title }}
 					</h4>
 				</div>
-				<div class="panel-body" v-link="appHelpers.routeToEditPage(packageId, page.pageId)">
+				<div class="panel-body" v-link="appHelpers.routeToEditPage(packageId, page.objectId)">
 					{{ page.content | excerpt 100 }}
 				</div>
 			</div>
@@ -78,13 +78,13 @@
 				}
 			},
 			onAdded (page) {
-				let exists = this.pages.find((p) => p.pageId === page.pageId)
+				let exists = this.pages.find((p) => p.objectId === page.objectId)
 				if (!exists) {
 					this.pages.push(page)
 				}
 			},
-			onRemoved (pageId) {
-				this.pages = this.pages.filter((p) => p.pageId !== pageId)
+			onRemoved (objectId) {
+				this.pages = this.pages.filter((p) => p.objectId !== objectId)
 			},
 			nextPage () {
 				if (!this.paginator || (this.paginator && !this.paginator.isLastPage())) {

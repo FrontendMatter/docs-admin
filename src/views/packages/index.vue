@@ -14,17 +14,17 @@
 			<div class="panel panel-default panel-package">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<button class="close" @click="removePackage(package.name)">&times;</button>
+						<button class="close" @click="removePackage(package.objectId)">&times;</button>
 						{{ package.name }}
 					</h4>
 				</div>
 				<template v-if="package.content">
-					<div class="panel-body" v-link="appHelpers.routeToPackageComponents(package.name)">
+					<div class="panel-body" v-link="appHelpers.routeToPackageComponents(package.objectId)">
 						{{ package.content | excerpt 60 }}
 					</div>
 					<hr>
 				</template>
-				<div class="panel-body text-center" v-link="appHelpers.routeToPackageComponents(package.name)">
+				<div class="panel-body text-center" v-link="appHelpers.routeToPackageComponents(package.objectId)">
 					<strong>{{ package.components }}</strong> components
 				</div>
 			</div>
@@ -57,17 +57,17 @@
 		},
 		methods: {
 			onAdded (data) {
-				const exists = this.packages.find((p) => p.name === data.name)
+				const exists = this.packages.find((p) => p.objectId === data.objectId)
 				if (!exists) {
 					this.packages.push(data)
 				}
 			},
-			onRemoved (name) {
-				this.packages = this.packages.filter((p) => p.name !== name)
+			onRemoved (packageId) {
+				this.packages = this.packages.filter((p) => p.objectId !== packageId)
 			},
-			removePackage (name) {
+			removePackage (packageId) {
 				if (confirm('Are you sure you want to remove this package?')) {
-					this.store.removePackage(name)
+					this.store.removePackage(packageId)
 				}
 			}
 		},

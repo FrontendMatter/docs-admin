@@ -3,175 +3,88 @@
 	<!-- Loading -->
 	<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
 	
-	<template v-if="!serviceLoading">
+	<!-- Main form -->
+	<validator name="validation">
+		<form @submit.prevent="create" v-show="!serviceLoading">
 
-		<!-- Main form -->
-		<validator name="validation">
-			<form @submit.prevent="create">
-
-				<div class="page-header">
-					<div class="pull-right">
-						<button type="button" class="btn btn-link" @click="cancel">Cancel</button>
-						<button type="submit" class="btn btn-success">Save</button>
-					</div>
-					<h1 v-text="isEditView ? 'Edit component' : 'Create component'"></h1>
-				</div>
-
-				<div class="form-group" 
-					:class="{ 'has-error': hasValidationError('name') }">
-					<label for="name">Component name</label>
-					<input type="text" 
-						id="name"
-						class="form-control" 
-						v-model="model.name" 
-						v-validate:name="{ required: { rule: true, message: 'The component name is required' } }"
-						:autofocus="!isEditView"  />
-					<p class="help-block" v-for="msg in validationMessages('name')">{{ msg }}</p>
-				</div>
-				<div class="form-group" 
-					:class="{ 'has-error': hasValidationError('description') }">
-					<label for="description">Description</label>
-					<textarea id="description"
-						class="form-control" 
-						v-model="model.description" 
-						v-validate:description="{ required: { rule: true, message: 'The component description is required' } }">
-					</textarea>
-					<p class="help-block" v-for="msg in validationMessages('description')">{{ msg }}</p>
-				</div>
-
-				<div class="page-header">
-					<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#add-property">Add property</button>
-					<h2>Properties</h2>
-				</div>
-
-				<!-- Property -->
-				<template 
-					v-if="component.props" 
-					v-for="(key, prop) in model.props">
-
-					<!-- Editable property -->
-					<div class="form-group form-group-prop"
-						v-if="isEditable('props.' + key)" 
-						:class="{ 'has-error': hasValidationError('prop-description-' + key) }">
-						<h3 id="prop-{{ key }}">{{ prop.name }}</h3>
-						<label for="prop-{{ key }}-description">Description</label>
-						<textarea id="prop-{{ key }}-description"
-							class="form-control" 
-							v-model="model.props[ key ].description" 
-							:field="'prop-description-' + key"
-							v-validate="{ required: { rule: true, message: 'The property description is required' } }">
-						</textarea>
-						<p class="help-block" v-for="msg in validationMessages('prop-description-' + key)">{{ msg }}</p>
-						<p class="help-block">
-							<button type="submit" class="btn btn-default">OK</button>
-							<button class="btn btn-default" @click.stop="toggleEditable('props.' + key)">Cancel</button>
-						</p>
-						<pre v-text="component.props[ key ] | json"></pre>
-						<button class="btn btn-link" @click.prevent.stop="removeProperty(key)">Remove</button>
-					</div>
-					<!-- // END Editable property -->
-					
-					<!-- Read-only property -->
-					<div v-else class="form-group form-group-prop">
-						<h3 id="prop-{{ key }}">{{ prop.name }}</h3>
-						<label>Description</label> 
-						<a href="#" @click.prevent.stop="toggleEditable('props.' + key)">Edit</a>
-						<p class="help-block">
-							<template v-if="model.props[key].description">
-								{{ model.props[key].description }}
-							</template>
-							<template v-else>
-								<span class="label label-danger">missing</span>
-								The property is missing a description. 
-								<a href="#" @click.prevent.stop="toggleEditable('props.' + key)">Add a description</a>
-							</template>
-						</p>
-						<pre v-text="component.props[ key ] | json"></pre>
-						<div>
-							<button type="submit" class="btn btn-link">Save</button>
-							<button class="btn btn-link" @click.prevent.stop="removeProperty(key)">Remove</button>
-						</div>
-					</div>
-					<!-- // END Read-only property -->
-
-				</template>
-				<!-- // END Property -->
-
-				<!-- No properties -->
-				<div v-if="!hasProps(component)" class="alert alert-default">
-					No properties.
-				</div>
-				
-				<!-- Main form controls -->
-				<div class="form-group">
-					<button type="submit" class="btn btn-success">Save</button>
+			<div class="page-header">
+				<div class="pull-right">
 					<button type="button" class="btn btn-link" @click="cancel">Cancel</button>
+					<button type="submit" class="btn btn-success">Save</button>
 				</div>
-			</form>
-		</validator>
-		<!-- // END Main form -->
+				<h1 v-text="isEditView ? 'Edit component' : 'Create component'"></h1>
+			</div>
 
-		<!-- Add property modal -->
-		<modal id="add-property"
-			title="Add property"
-			@save.tk.modal="addProperty"
-			slide panel>
-			<validator name="add-property-validation" slot="body">
-				<form @submit.prevent="submitAddProperty">
-					<div class="form-group" 
-						:class="{ 'has-error': hasValidationError('name', 'addPropertyValidation') }">
-						<label for="property-name">Property name</label>
-						<input type="text" 
-							class="form-control" 
-							v-model="property.name" 
-							v-validate:name="{ required: { rule: true, message: 'The property name is required' } }"
-							autofocus />
-						<p class="help-block" v-for="msg in validationMessages('name', 'addPropertyValidation')">{{ msg }}</p>
-					</div>
-					<div class="form-group" 
-						:class="{ 'has-error': hasValidationError('description', 'addPropertyValidation') }">
-						<label for="property-description">Description</label>
-						<textarea id="property-description"
-							class="form-control" 
-							v-model="property.description" 
-							v-validate:description="{ required: { rule: true, message: 'The property description is required' } }">
-						</textarea>
-						<p class="help-block" v-for="msg in validationMessages('description', 'addPropertyValidation')">{{ msg }}</p>
-					</div>
-				</form>
-			</validator>
-		</modal>
-		<!-- // END Add property modal -->
+			<!-- Component name -->
+			<div class="form-group" 
+				:class="{ 'has-error': hasValidationError('name') }">
+				<label for="name">Component name</label>
+				<input type="text" 
+					id="name"
+					class="form-control" 
+					v-model="model.name" 
+					debounce="300"
+					v-validate:name="{ required: { rule: true, message: 'The component name is required' } }"
+					:autofocus="!isEditView"  />
+				<p class="help-block" v-for="msg in validationMessages('name')">{{ msg }}</p>
+			</div>
 
-	</template>
+			<!-- Component description -->
+			<div class="form-group" 
+				:class="{ 'has-error': hasValidationError('content', 'descriptionValidator') }">
+				<label for="description">Description</label>
+
+				<markdown-editor
+					:model.sync="model.description"
+					:validator.sync="descriptionValidator"
+					:validate="{ required: { rule: true, message: 'The component description is required.' } }"
+					:marked-options="appConfig.marked">
+				</markdown-editor>
+
+				<p class="help-block" v-for="msg in validationMessages('content', 'descriptionValidator')">{{ msg }}</p>
+			</div>
+
+			<!-- Demos -->
+			<component-demos v-if="componentId" :component-id="componentId"></component-demos>
+
+			<!-- Props -->
+			<component-props :component="component" :model.sync="model"></component-props>
+			
+			<!-- Main form controls -->
+			<div class="form-group">
+				<button type="submit" class="btn btn-success">Save</button>
+				<button type="button" class="btn btn-link" @click="cancel">Cancel</button>
+			</div>
+		</form>
+	</validator>
+	<!-- // END Main form -->
 
 </template>
 
 <script>
 	import appStore from 'themekit-docs/src/js/app.store'
-	import { AlertNotification } from 'themekit-vue'
 	import Store from 'themekit-docs/src/mixins/store'
 	import Validation from 'vue-validator-util'
+	import ComponentDemos from 'themekit-docs/src/components/component-demos'
+	import ComponentProps from 'themekit-docs/src/components/component-props'
+	import { AlertNotification } from 'themekit-vue'
+	import { MarkdownEditor } from 'vue-markdown-editor'
 
-	import { Modal } from 'themekit-vue'
 	import merge from 'mout/object/merge'
 	import forOwn from 'mout/object/forOwn'
-	import set from 'mout/object/set'
-	import get from 'mout/object/get'
-	import slugify from 'mout/string/slugify'
-	import camelCase from 'mout/string/camelCase'
 	import properCase from 'mout/string/properCase'
 	import unhyphenate from 'mout/string/unhyphenate'
 	
 	export default {
 		mixins: [
-			AlertNotification,
 			Store,
-			Validation
+			Validation,
+			AlertNotification
 		],
 		data () {
 			return {
 				appHelpers: appStore.helpers,
+				appConfig: appStore.config,
 
 				// main form model
 				model: {
@@ -181,21 +94,14 @@
 					description: null,
 					props: {},
 					events: {},
-					requirements: [],
-					demo: null
+					requirements: []
 				},
+
 				// sync model
 				sync: null,
 
-				// editable fields
-				editable: {},
-
-				// add property form
-				property: {
-					name: null,
-					description: null
-				},
-				addPropertyModal: null
+				// vue-markdown-editor validator
+				descriptionValidator: null
 			}
 		},
 		route: {
@@ -205,9 +111,6 @@
 			component () {
 				return this.sync ? merge({}, this.sync, this.model) : this.model
 			},
-			valid () {
-				return this.$validation.valid
-			},
 			packageId () {
 				return this.$route.params.id
 			},
@@ -216,6 +119,9 @@
 			},
 			isEditView () {
 				return this.componentId
+			},
+			valid () {
+				return this.$validation.valid && this.descriptionValidator.valid
 			}
 		},
 		methods: {
@@ -223,7 +129,10 @@
 				this.didSubmit = true
 				if (this.valid) {
 					this.model.label = properCase(unhyphenate(this.model.name))
-					this.store.setComponent(this.model.name, this.saveFormatter()).then(() => {
+					this.store.setComponent(this.componentId, this.saveFormatter()).then((objectId) => {
+						if (!this.model.objectId) {
+							this.model.objectId = objectId
+						}
 						this.didSubmit = false
 						this.success('The component was saved.')
 					})
@@ -233,7 +142,7 @@
 				this.$route.router.go(this.appHelpers.routeToPackageComponents(this.packageId))
 			},
 			goToEditComponent () {
-				this.$route.router.go(this.appHelpers.routeToEditComponent(this.packageId, this.model.name))
+				this.$route.router.go(this.appHelpers.routeToEditComponent(this.packageId, this.model.objectId))
 			},
 			cancel () {
 				this.goToPackage()
@@ -243,14 +152,6 @@
 				if (!this.isEditView) {
 					this.goToEditComponent()
 				}
-			},
-			toggleEditable (key) {
-				let editable = {}
-				set(editable, key, !this.isEditable(key))
-				this.editable = Object.assign({}, this.editable, editable)
-			},
-			isEditable (key) {
-				return get(this.editable, key)
 			},
 			modelSyncFormatter (sync) {
 				let model = this.model
@@ -270,47 +171,6 @@
 					}
 				})
 				return model
-			},
-			addProperty ({ abort, next }) {
-
-				// validate
-				this.didSubmit = true
-				if (this.getValidator('add-property-validation').invalid) {
-					return abort('save')
-				}
-
-				// format property model
-				this.property.name = slugify(this.property.name)
-				let key = camelCase(this.property.name)
-				let property = {}
-				property[key] = this.property
-
-				// add property
-				this.model.props = Object.assign({}, this.model.props, property)
-				this.model = Object.assign({}, this.model)
-
-				// reset
-				this.didSubmit = false
-				next('save')
-
-				// scroll to element
-				this.$nextTick(() => {
-					this.$dispatch('scrollTo.tk.scrollable', '#prop-' + key)
-				})
-			},
-			submitAddProperty () {
-				if (this.addPropertyModal) {
-					this.addPropertyModal.save()
-				}
-			},
-			removeProperty (key) {
-				if (confirm('Are you sure you want to remove this property?')) {
-					delete this.model.props[key]
-					this.model = Object.assign({}, this.model)
-				}
-			},
-			hasProps (component) {
-				return component.props && Object.keys(component.props).length
 			}
 		},
 		created () {
@@ -338,22 +198,16 @@
 					if (sync) {
 						this.sync = sync
 					}
-					if (!this.model.packageId) {
-						this.model.packageId = this.packageId
-					}
 				})
 			}
 			else {
 				this.model.packageId = this.packageId
 			}
 		},
-		events: {
-			'ready.tk.modal': function (modal) {
-				this.addPropertyModal = modal
-			}
-		},
 		components: {
-			Modal
+			ComponentDemos,
+			ComponentProps,
+			MarkdownEditor
 		}
 	}
 </script>
