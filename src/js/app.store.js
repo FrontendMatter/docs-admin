@@ -1,9 +1,10 @@
 /* eslint no-undef:0 */
-function routeToPackage (routeName, packageId) {
+function routeToPackage (routeName, packageId, version = 'latest') {
 	return {
 		name: routeName,
 		params: {
-			id: packageId
+			id: packageId,
+			version
 		}
 	}
 }
@@ -24,28 +25,6 @@ export default {
 		components: null
 	},
 	helpers: {
-		routeToPackage (packageId) {
-			return routeToPackage('package', packageId)
-		},
-		routeToComponent (packageId, componentId) {
-			return {
-				name: 'component',
-				params: {
-					id: packageId,
-					componentId
-				}
-			}
-		},
-		routeToPage (packageId, slug, pageId) {
-			return {
-				name: 'page',
-				params: {
-					id: packageId,
-					slug,
-					pageId
-				}
-			}
-		},
 		routeToEditComponent (packageId, componentId) {
 			return {
 				name: 'package.edit.component',
@@ -65,27 +44,28 @@ export default {
 				name: 'package.create'
 			}
 		},
-		routeToEditPackage (packageId) {
-			return routeToPackage('package.edit', packageId)
+		routeToEditPackage (packageId, version) {
+			return routeToPackage('package.edit', packageId, version)
 		},
-		routeToPackageComponents (packageId) {
-			return routeToPackage('package.components', packageId)
+		routeToPackageComponents (packageId, version) {
+			return routeToPackage('package.components', packageId, version)
 		},
-		routeToPackagePages (packageId) {
-			return routeToPackage('package.pages', packageId)
+		routeToPackagePages (packageId, version) {
+			return routeToPackage('package.pages', packageId, version)
 		},
-		routeToCreateComponent (packageId) {
-			return routeToPackage('package.create.component', packageId)
+		routeToCreateComponent (packageId, version) {
+			return routeToPackage('package.create.component', packageId, version)
 		},
-		routeToCreatePage (packageId) {
-			return routeToPackage('package.create.page', packageId)
+		routeToCreatePage (packageId, version) {
+			return routeToPackage('package.create.page', packageId, version)
 		},
-		routeToEditPage (packageId, pageId) {
+		routeToEditPage (packageId, pageId, version = 'latest') {
 			return {
 				name: 'package.edit.page',
 				params: {
 					id: packageId,
-					pageId
+					pageId,
+					version
 				}
 			}
 		}

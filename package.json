@@ -37,7 +37,7 @@
     "sass-loader": "^3.1.2",
     "style-import-loader": "^0.2.0",
     "style-loader": "^0.13.0",
-    "themekit-docs-store": "^1.0.2",
+    "themekit-docs-store": "^1.2.0",
     "themekit-vue": "github:themekit/themekit-vue",
     "themekit-webpack-config": "^1.0.1",
     "url-loader": "^0.5.7",

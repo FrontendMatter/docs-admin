@@ -61,6 +61,7 @@
 	import { AlertNotification } from 'themekit-vue'
 	import { MarkdownEditor } from 'vue-markdown-editor'
 	import slugify from 'mout/string/slugify'
+	import merge from 'mout/object/merge'
 	
 	export default {
 		mixins: [
@@ -75,8 +76,8 @@
 
 				// main form model
 				model: {
-					pageId: null,
 					packageId: null,
+					version: null,
 					title: null,
 					content: null,
 					slug: null
@@ -91,6 +92,9 @@
 		computed: {
 			packageId () {
 				return this.$route.params.id
+			},
+			version () {
+				return this.$route.params.version
 			},
 			pageId () {
 				return this.$route.params.pageId
@@ -107,7 +111,7 @@
 				this.didSubmit = true
 				if (this.valid) {
 					this.model.slug = slugify(this.model.title)
-					this.store.setPage(this.pageId, this.model).then((objectId) => {
+					this.store.setPage(this.pageId, this.model, this.version).then((objectId) => {
 						if (!this.model.objectId) {
 							this.model.objectId = objectId
 						}
@@ -117,10 +121,10 @@
 				}
 			},
 			goToPackage () {
-				this.$route.router.go(this.appHelpers.routeToPackagePages(this.packageId))
+				this.$router.go(this.appHelpers.routeToPackagePages(this.packageId, this.version))
 			},
 			goToEditPage () {
-				this.$route.router.go(this.appHelpers.routeToEditPage(this.packageId, this.model.objectId))
+				this.$router.go(this.appHelpers.routeToEditPage(this.packageId, this.model.objectId, this.version))
 			},
 			cancel () {
 				this.goToPackage()
@@ -133,13 +137,17 @@
 			}
 		},
 		created () {
+			const mergeModel = {
+				packageId: this.packageId,
+				version: this.version
+			}
 			if (this.isEditView) {
-				this.store.getPage(this.pageId).then((page) => {
-					this.model = page
+				this.store.getPage(this.pageId, this.version).then((page) => {
+					this.model = merge(page, mergeModel)
 				})
 			}
 			else {
-				this.model.packageId = this.packageId
+				this.model = merge(this.model, mergeModel)
 			}
 		},
 		components: {

@@ -48,11 +48,17 @@
 			<template v-if="pkg">
 				<div class="sidebar-block bg-white">
 					<h4 class="sidebar-category">{{ pkg.name }}</h4>
-					<a v-link="appHelpers.routeToEditPackage(packageId)">Edit package</a>
+					<p><a v-link="appHelpers.routeToEditPackage(packageId, version)">Edit package</a></p>
+					<div class="form-group">
+						<label for="version">Version</label>
+						<select id="version" class="form-control" v-model="version">
+							<option v-for="version in versions" value="{{ version.version }}" :selected="version.selected">{{ version.version }}</option>
+						</select>
+					</div>
 				</div>
 				<sidebar-menu :class="sidebarMenuClass" heading="Package navigation">
-					<sidebar-collapse-item :model="{ label: 'Components', route: appHelpers.routeToPackageComponents(packageId) }"></sidebar-collapse-item>
-					<sidebar-collapse-item :model="{ label: 'Pages', route: appHelpers.routeToPackagePages(packageId) }"></sidebar-collapse-item>
+					<sidebar-collapse-item :model="{ label: 'Components', route: appHelpers.routeToPackageComponents(packageId, version) }"></sidebar-collapse-item>
+					<sidebar-collapse-item :model="{ label: 'Pages', route: appHelpers.routeToPackagePages(packageId, version) }"></sidebar-collapse-item>
 				</sidebar-menu>
 			</template>
 			<!-- // END Package menu -->
@@ -93,7 +99,9 @@
 				appConfig: appStore.config,
 				appHelpers: appStore.helpers,
 				user: user,
-				pkg: null
+				pkg: null,
+				version: 'latest',
+				versions: []
 			}
 		},
 		route: {
@@ -112,20 +120,49 @@
 			},
 			isPackageView () {
 				return this.packageId !== undefined
+			},
+			versionRoute () {
+				return this.$route.params.version
 			}
 		},
 		created () {
-			if (this.packageId) {
-				this.store.getPackage(this.packageId).then((pkg) => {
-					this.pkg = pkg
-				})
-			}
+			this.loadPackage()
 		},
 		methods: {
 			transformHit (hit) {
-				hit.route = this.appHelpers.routeToEditComponent(hit.packageId, hit.name)
+				hit.route = this.appHelpers.routeToEditComponent(hit.packageId, hit.name, this.version)
 				return hit
+			},
+			loadPackage () {
+				if (this.packageId) {
+					this.store.getPackageVersions(this.packageId).then((versions) => {
+						this.versions = versions
+						this.updateVersion()
+						this.getPackage()
+					})
+				}
+			},
+			getPackage () {
+				this.store.getPackage(this.packageId, this.version).then((pkg) => {
+					this.pkg = pkg
+				})
+			},
+			updateVersion () {
+				this.version = this.versionRoute
+				this.versions = this.versions.map((v) => {
+					v.selected = this.version === v.version ? 'selected' : false
+					return v
+				})
 			}
+		},
+		watch: {
+			version (value) {
+				if (value) {
+					this.$router.go({ name: this.$route.name, params: { version: value } })
+				}
+			},
+			packageId: 'loadPackage',
+			versionRoute: 'updateVersion'
 		},
 		components: {
 			LayoutTransition,

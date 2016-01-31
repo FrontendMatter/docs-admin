@@ -1,7 +1,7 @@
 <template>
 
 	<div class="page-header">
-		<button class="btn btn-primary pull-right" v-link="appHelpers.routeToCreateComponent(packageId)">Add component</button>
+		<button class="btn btn-primary pull-right" v-link="appHelpers.routeToCreateComponent(packageId, version)">Add component</button>
 		<h1>Components</h1>
 	</div>
 
@@ -57,6 +57,9 @@
 		mixins: [
 			Store
 		],
+		route: {
+			canReuse: false
+		},
 		data () {
 			return {
 				components: [],
@@ -68,12 +71,15 @@
 		computed: {
 			packageId () {
 				return this.$route.params.id
+			},
+			version () {
+				return this.$route.params.version
 			}
 		},
 		methods: {
 			removeComponent (objectId) {
 				if (confirm('Are you sure you want to remove this component?')) {
-					this.store.removeComponent(objectId)
+					this.store.removeComponent(objectId, this.version)
 				}
 			},
 			onAdded ({ component, sync, merge }) {
@@ -135,7 +141,7 @@
 			}
 		},
 		created () {
-			this.store.getPackageComponents(this.packageId).then((components) => {
+			this.store.getPackageComponents(this.packageId, this.version).then((components) => {
 				components.map((component) => this.onAdded(component))
 				this.store.onComponentRemoved(this.onRemoved)
 			})

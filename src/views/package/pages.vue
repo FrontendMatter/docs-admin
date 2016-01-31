@@ -1,7 +1,7 @@
 <template>
 
 	<div class="page-header">
-		<button class="btn btn-primary pull-right" v-link="appHelpers.routeToCreatePage(packageId)">Add page</button>
+		<button class="btn btn-primary pull-right" v-link="appHelpers.routeToCreatePage(packageId, version)">Add page</button>
 		<h1>Pages</h1>
 	</div>
 
@@ -18,7 +18,7 @@
 						{{ page.title }}
 					</h4>
 				</div>
-				<div class="panel-body" v-link="appHelpers.routeToEditPage(packageId, page.objectId)">
+				<div class="panel-body" v-link="appHelpers.routeToEditPage(packageId, page.objectId, version)">
 					{{ page.content | excerpt 100 }}
 				</div>
 			</div>
@@ -59,6 +59,9 @@
 				return crop(value, length || 30)
 			}
 		},
+		route: {
+			canReuse: false
+		},
 		data () {
 			return {
 				pages: [],
@@ -69,12 +72,15 @@
 		computed: {
 			packageId () {
 				return this.$route.params.id
+			},
+			version () {
+				return this.$route.params.version
 			}
 		},
 		methods: {
 			removePage (pageId) {
 				if (confirm('Are you sure you want to remove this page?')) {
-					this.store.removePage(pageId)
+					this.store.removePage(pageId, this.version)
 				}
 			},
 			onAdded (page) {
@@ -88,7 +94,7 @@
 			},
 			nextPage () {
 				if (!this.paginator || (this.paginator && !this.paginator.isLastPage())) {
-					this.store.nextPage('pages').then((pages) => {
+					this.store.nextPage('pages', this.version).then((pages) => {
 						this.pages = pages
 						this.paginator = this.store.paginator.pages
 					})
@@ -96,7 +102,7 @@
 			},
 			prevPage () {
 				if (this.paginator && !this.paginator.isFirstPage()) {
-					this.store.prevPage('pages').then((pages) => {
+					this.store.prevPage('pages', this.version).then((pages) => {
 						this.pages = pages
 						this.paginator = this.store.paginator.pages
 					})
@@ -104,7 +110,7 @@
 			}
 		},
 		created () {
-			this.store.paginatePages(this.packageId)
+			this.store.paginatePages(this.packageId, this.version)
 			this.nextPage('pages')
 			this.store.onPageRemoved(this.onRemoved)
 		},

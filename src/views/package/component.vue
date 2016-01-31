@@ -45,7 +45,7 @@
 			</div>
 
 			<!-- Demos -->
-			<component-demos v-if="componentId" :component-id="componentId"></component-demos>
+			<component-demos v-if="componentId"></component-demos>
 
 			<!-- Props -->
 			<component-props :component="component" :model.sync="model"></component-props>
@@ -91,10 +91,9 @@
 					name: null,
 					label: null,
 					packageId: null,
+					version: null,
 					description: null,
-					props: {},
-					events: {},
-					requirements: []
+					props: {}
 				},
 
 				// sync model
@@ -117,6 +116,9 @@
 			componentId () {
 				return this.$route.params.componentId
 			},
+			version () {
+				return this.$route.params.version
+			},
 			isEditView () {
 				return this.componentId
 			},
@@ -129,7 +131,7 @@
 				this.didSubmit = true
 				if (this.valid) {
 					this.model.label = properCase(unhyphenate(this.model.name))
-					this.store.setComponent(this.componentId, this.saveFormatter()).then((objectId) => {
+					this.store.setComponent(this.componentId, this.saveFormatter(), this.version).then((objectId) => {
 						if (!this.model.objectId) {
 							this.model.objectId = objectId
 						}
@@ -139,10 +141,10 @@
 				}
 			},
 			goToPackage () {
-				this.$route.router.go(this.appHelpers.routeToPackageComponents(this.packageId))
+				this.$router.go(this.appHelpers.routeToPackageComponents(this.packageId, this.version))
 			},
 			goToEditComponent () {
-				this.$route.router.go(this.appHelpers.routeToEditComponent(this.packageId, this.model.objectId))
+				this.$router.go(this.appHelpers.routeToEditComponent(this.packageId, this.model.objectId, this.version))
 			},
 			cancel () {
 				this.goToPackage()
@@ -184,8 +186,13 @@
 				}, 200)
 			})
 
+			const mergeModel = {
+				packageId: this.packageId,
+				version: this.version
+			}
+
 			if (this.isEditView) {
-				this.store.getComponent(this.componentId).then(({ component, sync }) => {
+				this.store.getComponent(this.componentId, this.version).then(({ component, sync }) => {
 					if (component && sync) {
 						this.model = merge(this.modelSyncFormatter(sync), component)
 					}
@@ -198,10 +205,11 @@
 					if (sync) {
 						this.sync = sync
 					}
+					this.model = merge(this.model, mergeModel)
 				})
 			}
 			else {
-				this.model.packageId = this.packageId
+				this.model = merge(this.model, mergeModel)
 			}
 		},
 		components: {

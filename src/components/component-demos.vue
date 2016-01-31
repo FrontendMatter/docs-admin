@@ -3,7 +3,7 @@
 		<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#add-demo">Add demo</button>
 		<h2>Demos</h2>
 	</div>
-	<div class="list-group list-group-demos" v-if="demos.length">
+	<div class="list-group list-group-media" v-if="demos.length">
 		<div class="list-group-item media" v-for="demo in demos">
 			<div class="media-body">
 				<a href="{{ demo.url }}" target="_blank">{{ demo.url }}</a>
@@ -65,13 +65,13 @@
 				demos: []
 			}
 		},
-		props: {
-			componentId: {
-				type: String,
-				required: true
-			}
-		},
 		computed: {
+			componentId () {
+				return this.$route.params.componentId
+			},
+			version () {
+				return this.$route.params.version
+			},
 			validateUrl () {
 				return { 
 					required: { rule: true, message: 'The demo URL is required' },
@@ -90,8 +90,9 @@
 				next('save')
 			},
 			save () {
-				const ref = this.store.componentDemosRef(this.componentId).push()
-				this.store.set(ref, this.model).then((objectId) => {
+				const ref = this.store.componentDemosRef(this.componentId, this.version).push()
+				const objectId = ref.key()
+				this.store.set(ref, this.model).then(() => {
 					this.model.objectId = objectId
 					this.demos.push(this.model)
 					this.alertNotificationSuccess('The demo was saved.')
@@ -106,7 +107,7 @@
 			},
 			remove (demo) {
 				if (confirm('Are you sure you want to remove this demo?')) {
-					const ref = this.store.componentDemosRef(this.componentId).child(demo.objectId)
+					const ref = this.store.componentDemosRef(this.componentId, this.version).child(demo.objectId)
 					this.store.remove(ref).then(() => {
 						this.demos.$remove(demo)
 					})
@@ -115,7 +116,7 @@
 		},
 		created () {
 			if (this.componentId) {
-				this.store.getComponentDemos(this.componentId).then((demos) => {
+				this.store.getComponentDemos(this.componentId, this.version).then((demos) => {
 					demos.map((demo) => {
 						const exists = this.demos.find((d) => d.demoId === demo.demoId)
 						if (!exists) {
@@ -135,11 +136,3 @@
 		}
 	}
 </script>
-
-<style lang="sass">
-	.list-group-demos {
-		.list-group-item {
-			margin-top: 0
-		}
-	}
-</style>

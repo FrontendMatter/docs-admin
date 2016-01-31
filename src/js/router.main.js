@@ -36,43 +36,43 @@ router.map({
 			require(['../views/package/package'], resolve)
 		}
 	},
-	'/packages/edit/:id': {
+	'/packages/edit/:id/:version': {
 		name: 'package.edit',
 		component: function (resolve) {
 			require(['../views/package/package'], resolve)
 		}
 	},
-	'/packages/:id': {
+	'/packages/:id/:version': {
 		name: 'package.components',
 		component: function (resolve) {
 			require(['../views/package/components'], resolve)
 		}
 	},
-	'/packages/:id/components/create': {
+	'/packages/:id/:version/components/create': {
 		name: 'package.create.component',
 		component: function (resolve) {
 			require(['../views/package/component'], resolve)
 		}
 	},
-	'/packages/:id/components/edit/:componentId': {
+	'/packages/:id/:version/components/edit/:componentId': {
 		name: 'package.edit.component',
 		component: function (resolve) {
 			require(['../views/package/component'], resolve)
 		}
 	},
-	'/packages/:id/pages': {
+	'/packages/:id/:version/pages': {
 		name: 'package.pages',
 		component: function (resolve) {
 			require(['../views/package/pages'], resolve)
 		}
 	},
-	'/packages/:id/pages/create': {
+	'/packages/:id/:version/pages/create': {
 		name: 'package.create.page',
 		component: function (resolve) {
 			require(['../views/package/page'], resolve)
 		}
 	},
-	'/packages/:id/pages/edit/:pageId': {
+	'/packages/:id/:version/pages/edit/:pageId': {
 		name: 'package.edit.page',
 		component: function (resolve) {
 			require(['../views/package/page'], resolve)
@@ -80,14 +80,14 @@ router.map({
 	}
 })
 
-router.beforeEach(({ to, next }) => {
+router.beforeEach(({ to, next, abort }) => {
 	const auth = user.getAuth()
 
 	if (to.name !== 'auth' && !auth) {
-		router.go('auth')
+		router.go({ path: 'auth', append: false })
 	}
 	else if (to.name === 'auth' && auth) {
-		router.go('packages')
+		router.go({ path: 'packages', append: false })
 	}
 	else {
 		next()
