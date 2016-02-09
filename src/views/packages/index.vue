@@ -6,25 +6,24 @@
 	</div>
 
 	<!-- Service Loading -->
-	<div class="alert alert-default" v-if="serviceLoading">Loading ...</div>
+	<div class="alert alert-default" v-if="serviceLoading && !packages.length">Loading ...</div>
 
 	<!-- Display list -->
-	<isotope v-if="!serviceLoading && packages.length">
+	<isotope v-if="packages.length">
 		<isotope-item class="col-md-4" v-for="package in packages">
 			<div class="panel panel-default panel-package">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<button class="close" @click="removePackage(package.objectId)">&times;</button>
-						{{ package.name }}
+						<button class="close" @click="removePackageVersion(package)">&times;</button>
+						{{ package.packageIdData.packageName }}
 					</h4>
 				</div>
-				<template v-if="package.content">
-					<div class="panel-body" v-link="appHelpers.routeToPackageComponents(package.objectId)">
-						{{ package.content | excerpt 60 }}
-					</div>
-					<hr>
-				</template>
-				<div class="panel-body text-center" v-link="appHelpers.routeToPackageComponents(package.objectId)">
+				<div class="panel-body" v-link="appHelpers.routeToPackageComponents(package.packageIdData.packageName, package.packageVersionIdData.version)">
+					<span class="label label-default">{{ package.packageVersionIdData.version }}</span>
+					<template v-if="package.description">{{ package.description.data | excerpt }}</template>
+				</div>
+				<hr>
+				<div class="panel-body text-center" v-link="appHelpers.routeToPackageComponents(package.packageIdData.packageName, package.packageVersionIdData.version)">
 					<strong>{{ package.components }}</strong> components
 				</div>
 			</div>
@@ -57,27 +56,26 @@
 		},
 		methods: {
 			onAdded (data) {
-				const exists = this.packages.find((p) => p.objectId === data.objectId)
+				const exists = this.packages.find((p) => p.packageVersionIdData.objectID === data.packageVersionIdData.objectID)
 				if (!exists) {
 					this.packages.push(data)
 				}
 			},
-			onRemoved (packageId) {
-				this.packages = this.packages.filter((p) => p.objectId !== packageId)
+			onRemoved (packageVersionId) {
+				const pkg = this.packages.find((p) => p.packageVersionIdData.objectID === packageVersionId)
+				if (pkg) {
+					this.packages.$remove(pkg)
+				}
 			},
-			removePackage (packageId) {
-				if (confirm('Are you sure you want to remove this package?')) {
-					this.store.removePackage(packageId)
+			removePackageVersion (pkg) {
+				if (confirm('Are you sure you want to remove this package version?')) {
+					this.store.removePackageVersion(pkg.packageVersionIdData.objectID)
 				}
 			}
 		},
 		created () {
-			this.store.getPackages().then((packages) => {
-				this.packages = packages
-
-				this.store.onPackageAdded(this.onAdded)
-				this.store.onPackageRemoved(this.onRemoved)
-			})
+			this.store.onPackageAdded(this.onAdded)
+			this.store.onPackageVersionRemoved(this.onRemoved)
 		},
 		components: {
 			Isotope,

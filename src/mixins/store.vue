@@ -17,7 +17,9 @@
 		methods: {
 			onServiceComplete () {
 				clearTimeout(this.serviceCompleteDebounce)
-				this.serviceCompleteDebounce = setTimeout(() => this.serviceLoading = false, 200)
+				this.serviceCompleteDebounce = setTimeout(() => {
+					this.serviceLoading = false
+				}, 250)
 			},
 			onServiceError (e) {
 				this.alertNotificationError(e)
@@ -39,6 +41,16 @@
 			store.removeListener('serviceComplete', this.onServiceComplete)
 			store.removeListener('serviceError', this.onServiceError)
 			clearTimeout(this.serviceCompleteDebounce)
+		},
+		watch: {
+			serviceLoading (value) {
+				if (value) {
+					$('button[type="submit"]').prop('disabled', true)
+				}
+				else {
+					$('button[type="submit"]').prop('disabled', false)
+				}
+			}
 		}
 	}
 </script>

@@ -1,9 +1,9 @@
 /* eslint no-undef:0 */
-function routeToPackage (routeName, packageId, version = 'latest') {
+function routeToPackage (routeName, packageName, version = 'latest') {
 	return {
 		name: routeName,
 		params: {
-			id: packageId,
+			packageName,
 			version
 		}
 	}
@@ -22,15 +22,18 @@ export default {
 		}
 	},
 	state: {
-		components: null
+		components: null,
+		pkg: null,
+		versions: null
 	},
 	helpers: {
-		routeToEditComponent (packageId, componentId) {
+		routeToEditComponent (packageName, componentName, version) {
 			return {
 				name: 'package.edit.component',
 				params: {
-					id: packageId,
-					componentId
+					packageName,
+					componentName,
+					version
 				}
 			}
 		},
@@ -44,11 +47,11 @@ export default {
 				name: 'package.create'
 			}
 		},
-		routeToEditPackage (packageId, version) {
-			return routeToPackage('package.edit', packageId, version)
+		routeToEditPackage (packageName, version) {
+			return routeToPackage('package.edit', packageName, version)
 		},
-		routeToPackageComponents (packageId, version) {
-			return routeToPackage('package.components', packageId, version)
+		routeToPackageComponents (packageName, version) {
+			return routeToPackage('package.components', packageName, version)
 		},
 		routeToPackagePages (packageId, version) {
 			return routeToPackage('package.pages', packageId, version)

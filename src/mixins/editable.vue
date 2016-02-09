@@ -9,13 +9,16 @@
 			}
 		},
 		methods: {
-			toggleEditable (key) {
+			toggleEditable (key, unique) {
 				let editable = {}
 				set(editable, key, !this.isEditable(key))
-				this.editable = Object.assign({}, this.editable, editable)
+				this.$set('editable', Object.assign((unique ? {} : this.editable), editable))
 			},
 			isEditable (key) {
 				return get(this.editable, key)
+			},
+			clearEditable () {
+				this.editable = {}
 			}
 		}
 	}

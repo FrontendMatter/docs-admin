@@ -1,16 +1,16 @@
 <template>
-	<h2>Versions</h2>
+	<h3>Versions</h3>
 
 	<!-- Loading -->
 	<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
 
-	<div class="list-group list-group-media" v-if="versions.length">
-		<div class="list-group-item media" v-for="pkg in versions">
+	<div class="list-group list-group-media" v-if="appState.versions.length">
+		<div class="list-group-item media" v-for="pkg in appState.versions">
 			<div class="media-body">
-				<a v-link="appHelpers.routeToEditPackage(packageId, pkg.version)">{{ pkg.version }}</a>
+				<a v-link="appHelpers.routeToEditPackage(packageName, pkg.version)">{{ pkg.version }}</a>
 			</div>
 			<div class="media-right">
-				<a href="#" @click.prevent="removePackage(pkg)" class="text-danger"><i class="fa fa-trash"></i></a>
+				<a href="#" @click.prevent="removePackageVersion(pkg)" class="text-danger"><i class="fa fa-trash"></i></a>
 			</div>
 		</div>
 	</div>
@@ -26,13 +26,13 @@
 		],
 		data () {
 			return {
-				versions: [],
-				appHelpers: appStore.helpers
+				appHelpers: appStore.helpers,
+				appState: appStore.state
 			}
 		},
 		computed: {
-			packageId () {
-				return this.$route.params.id
+			packageName () {
+				return this.$route.params.packageName
 			},
 			version () {
 				return this.$route.params.version
@@ -40,19 +40,17 @@
 		},
 		methods: {
 			matchesCurrentVersion (pkg) {
-				let { objectId, version } = pkg
-				return this.packageId === objectId && this.version === version
+				return this.version === pkg.version
 			},
-			removePackage (pkg) {
-				let { objectId, version } = pkg
+			removePackageVersion (pkg) {
 				if (confirm('Are you sure you want to remove this version?')) {
-					this.store.removePackage(objectId, version).then(() => {
-						this.versions.$remove(pkg)
+					this.store.removePackageVersion(pkg.objectID).then(() => {
+						this.appState.versions.$remove(pkg)
 						if (this.matchesCurrentVersion(pkg)) {
-							if (this.versions.length) {
+							if (this.appState.versions.length) {
 								this.$router.go({ 
 									name: this.$route.name,
-									params: { version: this.versions[0].version }
+									params: { version: this.appState.versions[0].version }
 								})
 							}
 							else {
@@ -62,18 +60,15 @@
 					})
 				}
 			}
-		},
-		created () {
-			if (this.packageId) {
-				this.store.getPackageVersions(this.packageId).then((versions) => {
-					versions.map((pkg) => {
-						const exists = this.versions.find((v) => v.version === pkg.version)
-						if (!exists) {
-							this.versions.push(pkg)
-						}
-					})
-				})
-			}
 		}
 	}
 </script>
+
+<style lang="sass">
+	.list-group-item {
+		a.active { 
+			font-weight: bold;
+			text-decoration: underline; 
+		}
+	}
+</style>

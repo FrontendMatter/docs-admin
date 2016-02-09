@@ -1,9 +1,9 @@
 <template>
-
-	<alert-notification fixed></alert-notification>
 	
-	<!-- Layout -->
 	<layout-transition>
+	<!-- Layout -->
+
+		<alert-notification fixed></alert-notification>
 
 		<!-- Navbar -->
 		<navbar slot="navbar-content" fixed="top">
@@ -24,12 +24,13 @@
 						:algolia-app-id="appConfig.algolia.appId"
 						:algolia-api-key="appConfig.algolia.apiKey"
 						algolia-index="components"
+						:algolia-query-options="algoliaQueryOptions"
 						:transform-hit="transformHit"
-						search-box-placeholder="Search components ...">
+						placeholder="Search components ...">
 					</algolia-instantsearch-dropdown>
 				</div>
 				<ul class="nav navbar-nav navbar-right">
-					<li><a v-link="'logout'">Logout</a></li>
+					<li><a v-link="{ name: 'logout', append: false }">Logout</a></li>
 				</ul>
 			</template>
 		</navbar>
@@ -44,24 +45,27 @@
 
 			<a v-link="appHelpers.routeToPackages()" class="sidebar-brand" slot="brand"><i class="fa fa-fw fa-chevron-left"></i> Packages</a>
 
-			<!-- Package menu -->
+			<!-- Service Loading -->
+			<div class="alert alert-default" v-if="serviceLoading && !pkg">Loading ...</div>
+
 			<template v-if="pkg">
+				<!-- Package menu -->
 				<div class="sidebar-block bg-white">
-					<h4 class="sidebar-category">{{ pkg.name }}</h4>
-					<p><a v-link="appHelpers.routeToEditPackage(packageId, version)">Edit package</a></p>
-					<div class="form-group">
+					<h4 class="sidebar-category">{{ pkg.packageIdData.packageName }}</h4>
+					<p><a v-link="appHelpers.routeToEditPackage(packageName, version)">Edit package</a></p>
+					<div class="form-group" v-if="versions.length">
 						<label for="version">Version</label>
-						<select id="version" class="form-control" v-model="version">
-							<option v-for="version in versions" value="{{ version.version }}" :selected="version.selected">{{ version.version }}</option>
+						<select id="version" class="form-control" v-model="selectedVersion">
+							<option v-for="v in versions" value="{{ v.version }}" :selected="v.version === version">{{ v.version }}</option>
 						</select>
 					</div>
 				</div>
 				<sidebar-menu :class="sidebarMenuClass" heading="Package navigation">
-					<sidebar-collapse-item :model="{ label: 'Components', route: appHelpers.routeToPackageComponents(packageId, version) }"></sidebar-collapse-item>
-					<sidebar-collapse-item :model="{ label: 'Pages', route: appHelpers.routeToPackagePages(packageId, version) }"></sidebar-collapse-item>
+					<sidebar-collapse-item :model="{ label: 'Components', route: appHelpers.routeToPackageComponents(packageName, version) }"></sidebar-collapse-item>
+					<sidebar-collapse-item :model="{ label: 'Pages', route: appHelpers.routeToPackagePages(packageName, version) }"></sidebar-collapse-item>
 				</sidebar-menu>
+				<!-- // END Package menu -->
 			</template>
-			<!-- // END Package menu -->
 
 		</sidebar-transition>
 
@@ -71,8 +75,8 @@
 		</div>
 		<!-- // END Content -->
 
-	</layout-transition>
 	<!-- // END layout -->
+	</layout-transition>
 
 </template>
 
@@ -89,7 +93,6 @@
 	user.setRef(appStore.config.storeFirebaseRef)
 
 	export default {
-		replace: false,
 		mixins: [
 			Store
 		],
@@ -98,18 +101,16 @@
 				packages: [],
 				appConfig: appStore.config,
 				appHelpers: appStore.helpers,
+				appState: appStore.state,
 				user: user,
 				pkg: null,
-				version: 'latest',
-				versions: []
+				versions: [],
+				selectedVersion: null
 			}
 		},
-		route: {
-			canReuse: false
-		},
 		computed: {
-			packageId () {
-				return this.$route.params.id
+			packageName () {
+				return this.$route.params.packageName
 			},
 			sidebarMenuClass () {
 				return {
@@ -119,50 +120,71 @@
 				}
 			},
 			isPackageView () {
-				return this.packageId !== undefined
+				return this.packageName !== undefined
 			},
-			versionRoute () {
+			version () {
 				return this.$route.params.version
+			},
+			algoliaQueryOptions () {
+				let options = {
+					hitsPerPage: 5,
+					distinct: true
+				}
+				if (this.isPackageView) {
+					options = Object.assign({}, options, {
+						facets: '*',
+						facetFilters: [
+							`packageId: ${ this.packageId }`,
+							`version: ${ this.version }`
+						]
+					})
+				}
+				return options
 			}
 		},
 		created () {
-			this.loadPackage()
+			this.getPackage()
 		},
 		methods: {
 			transformHit (hit) {
-				hit.route = this.appHelpers.routeToEditComponent(hit.packageId, hit.name, this.version)
+				hit.route = this.appHelpers.routeToEditComponent(hit.packageName, hit.name, hit.version)
 				return hit
 			},
-			loadPackage () {
-				if (this.packageId) {
-					this.store.getPackageVersions(this.packageId).then((versions) => {
-						this.versions = versions
-						this.updateVersion()
-						this.getPackage()
-					})
+			getPackageVersions () {
+				if (this.packageName) {
+					this.store.getPackageVersions(this.pkg.packageIdData.objectID).then((versions) => this.versions = versions)
 				}
 			},
 			getPackage () {
-				this.store.getPackage(this.packageId, this.version).then((pkg) => {
-					this.pkg = pkg
-				})
+				if (this.packageName) {
+					return this.store.getPackageVersionByName(this.packageName, this.version).then((pkg) => this.pkg = pkg)
+				}
+				this.pkg = null
+			},
+			updatePackage (value) {
+				this.appState.pkg = value
+				if (value) {
+					this.getPackageVersions()
+				}
 			},
 			updateVersion () {
-				this.version = this.versionRoute
-				this.versions = this.versions.map((v) => {
-					v.selected = this.version === v.version ? 'selected' : false
-					return v
-				})
+				this.selectedVersion = this.version
+				this.getPackage()
+			},
+			routeVersion () {
+				if (this.selectedVersion && this.version !== this.selectedVersion) {
+					this.$router.go({ name: this.$route.name, params: { version: this.selectedVersion } })
+				}
 			}
 		},
 		watch: {
-			version (value) {
-				if (value) {
-					this.$router.go({ name: this.$route.name, params: { version: value } })
-				}
-			},
-			packageId: 'loadPackage',
-			versionRoute: 'updateVersion'
+			packageName: 'getPackage',
+			version: 'updateVersion',
+			selectedVersion: 'routeVersion',
+			pkg: 'updatePackage',
+			versions (value) {
+				this.appState.versions = value
+			}
 		},
 		components: {
 			LayoutTransition,

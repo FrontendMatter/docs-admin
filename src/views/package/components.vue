@@ -1,38 +1,37 @@
 <template>
 
 	<div class="page-header">
-		<button class="btn btn-primary pull-right" v-link="appHelpers.routeToCreateComponent(packageId, version)">Add component</button>
+		<button class="btn btn-primary pull-right" v-link="appHelpers.routeToCreateComponent(packageName, version)">Add component</button>
 		<h1>Components</h1>
 	</div>
 
 	<!-- Service Loading -->
-	<div class="alert alert-default" v-if="serviceLoading">Loading ...</div>
+	<div class="alert alert-default" v-if="serviceLoading && !components.length">Loading ...</div>
 	
 	<!-- Display list -->
-	<isotope v-if="components">
+	<isotope v-if="components.length">
 		<isotope-item class="col-md-4" v-for="component in components">
 			<div class="panel panel-default panel-component">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<button class="close" @click="removeComponent(component.objectId)">&times;</button>
-						{{ component.name }}
+						<button class="close" @click="removeComponentVersion(component)">&times;</button>
+						{{ component.componentIdData.componentName }}
 					</h4>
 				</div>
-				<div class="panel-body" v-link="appHelpers.routeToEditComponent(packageId, component.objectId)">
-					<template v-if="component.description">
-						{{ component.description }}
+				<div class="panel-body" v-link="appHelpers.routeToEditComponent(packageName, component.componentIdData.componentName, version)">
+					<template v-if="component.description.data">
+						{{ component.description.data }}
 					</template>
 					<template v-else>
 						<span class="label label-danger">missing</span>
 					</template>
 				</div>
-				<ul class="list-group">
-					<li class="list-group-item" v-if="component.props">
+				<ul class="list-group" v-if="component.props.length">
+					<li class="list-group-item">
 						<span class="pull-right">
-							<i class="fa fa-circle text-red-500" v-if="missing(component.props)" :title="missing(component.props)"></i>
-							<i class="fa fa-circle text-orange-500" v-if="outsync(component.objectId, 'props')"></i>
+							<i class="fa fa-circle text-red-500" v-if="missing(component.props)" :title="missing(component.props) + ' missing description'"></i>
 						</span>
-						{{ length(component.props) }} properties 
+						{{ component.props.length }} properties 
 					</li>
 				</ul>
 			</div>
@@ -51,100 +50,72 @@
 	import { Isotope, IsotopeItem } from 'vue-isotope'
 	import appStore from 'themekit-docs/src/js/app.store'
 	import Store from 'themekit-docs/src/mixins/store'
-	import forOwn from 'mout/object/forOwn'
 
 	export default {
 		mixins: [
 			Store
 		],
-		route: {
-			canReuse: false
-		},
 		data () {
 			return {
 				components: [],
-				model: [],
-				sync: [],
-				appHelpers: appStore.helpers
+				appHelpers: appStore.helpers,
+				appState: appStore.state
 			}
 		},
 		computed: {
-			packageId () {
-				return this.$route.params.id
+			packageName () {
+				return this.$route.params.packageName
 			},
 			version () {
 				return this.$route.params.version
 			}
 		},
 		methods: {
-			removeComponent (objectId) {
+			removeComponentVersion (component) {
 				if (confirm('Are you sure you want to remove this component?')) {
-					this.store.removeComponent(objectId, this.version)
+					this.store.removeComponentVersion(component.componentVersionIdData.objectID)
 				}
 			},
-			onAdded ({ component, sync, merge }) {
+			onAdded (data) {
+				let exists = this.components.find((c) => c.componentVersionIdData.objectID === data.componentVersionIdData.objectID)
+				if (!exists) {
+					this.components.push(data)
+				}
+			},
+			onRemoved (componentVersionId) {
+				const component = this.components.find((c) => c.componentVersionIdData.objectID === componentVersionId)
 				if (component) {
-					let exists = this.model.find((m) => m.objectId === component.objectId)
-					if (!exists) {
-						this.model.push(component)
-					}
+					this.components.$remove(component)
 				}
-				if (sync) {
-					let exists = this.sync.find((s) => s.objectId === sync.objectId)
-					if (!exists) {
-						this.sync.push(sync)
-					}
-				}
-				if (merge) {
-					let exists = this.components.find((s) => s.objectId === merge.objectId)
-					if (!exists) {
-						this.components.push(merge)
-					}
-				}
-			},
-			onRemoved (objectId) {
-				const models = ['model', 'sync', 'components']
-				models.forEach((model) => {
-					this[model] = this[model].filter((m) => m.objectId !== objectId)
-				})
 			},
 			length (obj) {
 				return obj ? Object.keys(obj).length : 0
 			},
-			missing (obj) {
-				let missing = 0
-				forOwn(obj, (value) => {
-					if (!value.description) {
-						missing++
-					}
-				})
-				return missing
+			missing (props) {
+				return props.filter((v) => !v.description).length
 			},
-			component (componentId, collection) {
-				return this[collection].find((c) => {
-					return c.objectId === componentId
-				})
-			},
-			outsync (componentId, prop) {
-				let missing = 0
-				let component = this.component(componentId, 'model')
-				if (!component) {
-					return missing
+			getComponents (newValue, oldValue) {
+				if (oldValue) {
+					this.store.offPackageVersionComponentAdded(oldValue.packageVersionIdData.objectID)
 				}
-				let syncComponent = this.component(componentId, 'sync')
-				forOwn(component[prop], (value, key) => {
-					if (syncComponent && typeof syncComponent[prop][key] === 'undefined') {
-						missing++
-					}
-				})
-				return missing
+				if (this.appState.pkg) {
+					this.components = []
+					this.store.offPackageVersionComponentAdded(this.appState.pkg.packageVersionIdData.objectID)
+					this.store.onPackageVersionComponentAdded(this.appState.pkg.packageVersionIdData.objectID, this.onAdded)
+				}
 			}
 		},
 		created () {
-			this.store.getPackageComponents(this.packageId, this.version).then((components) => {
-				components.map((component) => this.onAdded(component))
-				this.store.onComponentRemoved(this.onRemoved)
-			})
+			this.getComponents()
+			this.store.onComponentVersionRemoved(this.onRemoved)
+		},
+		destroyed () {
+			if (this.appState.pkg) {
+				this.store.offPackageVersionComponentAdded(this.appState.pkg.packageVersionIdData.objectID)
+			}
+		},
+		watch: {
+			'appState.pkg': 'getComponents'
 		},
 		components: {
 			Isotope,

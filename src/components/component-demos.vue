@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#add-demo">Add demo</button>
-		<h2>Demos</h2>
+		<h3>Demos</h3>
 	</div>
 	<div class="list-group list-group-media" v-if="demos.length">
 		<div class="list-group-item media" v-for="demo in demos">
@@ -13,9 +13,7 @@
 			</div>
 		</div>
 	</div>
-	<div v-else class="alert alert-default">
-		No demos.
-	</div>
+	<div v-if="!serviceLoading && !demos.length" class="alert alert-default">No demos.</div>
 	
 	<!-- Add demo modal -->
 	<modal id="add-demo"
@@ -65,9 +63,15 @@
 				demos: []
 			}
 		},
+		props: {
+			component: {
+				type: Object,
+				required: true
+			}
+		},
 		computed: {
 			componentId () {
-				return this.$route.params.componentId
+				return this.component.componentIdData.objectID
 			},
 			version () {
 				return this.$route.params.version
@@ -90,10 +94,10 @@
 				next('save')
 			},
 			save () {
-				const ref = this.store.componentDemosRef(this.componentId, this.version).push()
-				const objectId = ref.key()
+				const ref = this.store.getRefComponentDemo(this.componentId).push()
+				const objectID = ref.key()
 				this.store.set(ref, this.model).then(() => {
-					this.model.objectId = objectId
+					this.model.objectID = objectID
 					this.demos.push(this.model)
 					this.alertNotificationSuccess('The demo was saved.')
 					this.didSubmit = false
@@ -107,24 +111,23 @@
 			},
 			remove (demo) {
 				if (confirm('Are you sure you want to remove this demo?')) {
-					const ref = this.store.componentDemosRef(this.componentId, this.version).child(demo.objectId)
+					const ref = this.store.getRefComponentDemo(this.componentId).child(demo.objectID)
 					this.store.remove(ref).then(() => {
 						this.demos.$remove(demo)
 					})
 				}
+			},
+			updateDemos () {
+				if (this.component && !this.demos.length) {
+					this.demos = this.component.demos
+				}
 			}
 		},
 		created () {
-			if (this.componentId) {
-				this.store.getComponentDemos(this.componentId, this.version).then((demos) => {
-					demos.map((demo) => {
-						const exists = this.demos.find((d) => d.demoId === demo.demoId)
-						if (!exists) {
-							this.demos.push(demo)
-						}
-					})
-				})
-			}
+			this.updateDemos()
+		},
+		watch: {
+			'component': 'updateDemos'
 		},
 		events: {
 			'ready.tk.modal': function (modal) {

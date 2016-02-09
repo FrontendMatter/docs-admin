@@ -14,11 +14,11 @@
 			<div class="panel panel-default panel-page">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<button class="close" @click="removePage(page.objectId)">&times;</button>
+						<button class="close" @click="removePage(page.objectID)">&times;</button>
 						{{ page.title }}
 					</h4>
 				</div>
-				<div class="panel-body" v-link="appHelpers.routeToEditPage(packageId, page.objectId, version)">
+				<div class="panel-body" v-link="appHelpers.routeToEditPage(packageId, page.objectID, version)">
 					{{ page.content | excerpt 100 }}
 				</div>
 			</div>
@@ -48,20 +48,11 @@
 	import { Isotope, IsotopeItem } from 'vue-isotope'
 	import appStore from 'themekit-docs/src/js/app.store'
 	import Store from 'themekit-docs/src/mixins/store'
-	import crop from 'mout/string/crop'
-
+	
 	export default {
 		mixins: [
 			Store
 		],
-		filters: {
-			excerpt: function (value, length) {
-				return crop(value, length || 30)
-			}
-		},
-		route: {
-			canReuse: false
-		},
 		data () {
 			return {
 				pages: [],
@@ -84,13 +75,13 @@
 				}
 			},
 			onAdded (page) {
-				let exists = this.pages.find((p) => p.objectId === page.objectId)
+				let exists = this.pages.find((p) => p.objectID === page.objectID)
 				if (!exists) {
 					this.pages.push(page)
 				}
 			},
-			onRemoved (objectId) {
-				this.pages = this.pages.filter((p) => p.objectId !== objectId)
+			onRemoved (objectID) {
+				this.pages = this.pages.filter((p) => p.objectID !== objectID)
 			},
 			nextPage () {
 				if (!this.paginator || (this.paginator && !this.paginator.isLastPage())) {

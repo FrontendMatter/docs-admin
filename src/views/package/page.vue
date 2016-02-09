@@ -39,7 +39,7 @@
 					:marked-options="appConfig.marked">
 				</markdown-editor>
 
-				<p class="help-block" v-for="msg in validationMessages('content', 'contentValidator')">{{ msg }}</p>
+				<p class="help-block" v-if="hasValidationError('content', 'contentValidator')">{{ firstValidationMessage('content', 'contentValidator') }}</p>
 			</div>
 			
 			<!-- Main form controls -->
@@ -86,9 +86,6 @@
 				contentValidator: null
 			}
 		},
-		route: {
-			canReuse: false
-		},
 		computed: {
 			packageId () {
 				return this.$route.params.id
@@ -111,9 +108,9 @@
 				this.didSubmit = true
 				if (this.valid) {
 					this.model.slug = slugify(this.model.title)
-					this.store.setPage(this.pageId, this.model, this.version).then((objectId) => {
-						if (!this.model.objectId) {
-							this.model.objectId = objectId
+					this.store.setPage(this.pageId, this.model, this.version).then((objectID) => {
+						if (!this.model.objectID) {
+							this.model.objectID = objectID
 						}
 						this.didSubmit = false
 						this.success('The page was saved.')
@@ -124,7 +121,7 @@
 				this.$router.go(this.appHelpers.routeToPackagePages(this.packageId, this.version))
 			},
 			goToEditPage () {
-				this.$router.go(this.appHelpers.routeToEditPage(this.packageId, this.model.objectId, this.version))
+				this.$router.go(this.appHelpers.routeToEditPage(this.packageId, this.model.objectID, this.version))
 			},
 			cancel () {
 				this.goToPackage()

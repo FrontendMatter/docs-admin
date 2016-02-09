@@ -44,13 +44,23 @@ blockquote {
 		}
 	}
 }
-.panel-heading .close {
-	position: relative;
-	top: -4px;
+.panel-heading {
+	.close {
+		position: relative;
+		top: -4px;
+	}
+	.label {
+		vertical-align: middle;
+		display: inline-block;
+		line-height: inherit;
+	}
 }
 .panel-default {
 	border-color: #fbfbfb;
 	background: #fbfbfb;
+}
+.panel-default-bordered {
+	border-color: $panel-default-border;
 }
 hr {
 	margin: 40px 0;
@@ -67,4 +77,11 @@ hr {
 
 .list-group-media .list-group-item {
 	margin-top: 0
+}
+.tab-content {
+	padding-left: 0;
+	padding-right: 0;
+}
+.text-link-color {
+	color: $link-color !important;
 }
