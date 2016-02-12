@@ -1,56 +1,50 @@
 <template>
 
+	<div class="page-header">
+		<h1 v-text="isEditView ? 'Edit page' : 'Create page'"></h1>
+		<span v-if="page" class="label label-default">{{ page.packageVersionIdData.version }}</span>
+	</div>
+
 	<!-- Loading -->
 	<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
 	
-	<template v-if="!serviceLoading">
-
-		<!-- Main form -->
-		<form @submit.prevent="create">
-			<validator name="validation">
-				<div class="page-header">
-					<div class="pull-right">
-						<button type="button" class="btn btn-link" @click="cancel">Cancel</button>
-						<button type="submit" class="btn btn-success">Save</button>
-					</div>
-					<h1 v-text="isEditView ? 'Edit page' : 'Create page'"></h1>
-				</div>
-
-				<div class="form-group" 
-					:class="{ 'has-error': hasValidationError('title') }">
-					<label for="title">Page title</label>
-					<input type="text" 
-						id="title"
-						class="form-control" 
-						v-model="model.title" 
-						v-validate:title="{ required: { rule: true, message: 'The page title is required' } }"
-						:autofocus="!isEditView"  />
-					<p class="help-block" v-for="msg in validationMessages('title')">{{ msg }}</p>
-				</div>
-			</validator>
+	<!-- Main form -->
+	<form @submit.prevent="save" v-show="(!serviceLoading && !isEditView) || page">
+		<validator name="validation">
 
 			<div class="form-group" 
-				:class="{ 'has-error': hasValidationError('content', 'contentValidator') }">
-				<label for="content">Content</label>
-
-				<markdown-editor
-					:model.sync="model.content"
-					:validator.sync="contentValidator"
-					:marked-options="appConfig.marked">
-				</markdown-editor>
-
-				<p class="help-block" v-if="hasValidationError('content', 'contentValidator')">{{ firstValidationMessage('content', 'contentValidator') }}</p>
+				:class="{ 'has-error': hasValidationError('title') }">
+				<label for="title">Page title</label>
+				<input type="text" 
+					id="title"
+					class="form-control" 
+					v-model="model.title" 
+					v-validate:title="{ required: { rule: true, message: 'The page title is required' } }"
+					:autofocus="!isEditView"  />
+				<p class="help-block" v-if="hasValidationError('title')">{{ firstValidationMessage('title') }}</p>
 			</div>
-			
-			<!-- Main form controls -->
-			<div class="form-group">
-				<button type="submit" class="btn btn-success">Save</button>
-				<button type="button" class="btn btn-link" @click="cancel">Cancel</button>
-			</div>
-		</form>
-		<!-- // END Main form -->
+		</validator>
 
-	</template>
+		<div class="form-group" 
+			:class="{ 'has-error': hasValidationError('content', 'contentValidator') }">
+			<label for="content">Content</label>
+
+			<markdown-editor
+				:model.sync="model.content"
+				:validator.sync="contentValidator"
+				:marked-options="appConfig.marked">
+			</markdown-editor>
+
+			<p class="help-block" v-if="hasValidationError('content', 'contentValidator')">{{ firstValidationMessage('content', 'contentValidator') }}</p>
+		</div>
+		
+		<!-- Main form controls -->
+		<div class="form-group">
+			<button type="submit" class="btn btn-success">Save</button>
+			<button type="button" class="btn btn-link" @click="cancel">Cancel</button>
+		</div>
+	</form>
+	<!-- // END Main form -->
 
 </template>
 
@@ -61,7 +55,6 @@
 	import { AlertNotification } from 'themekit-vue'
 	import { MarkdownEditor } from 'vue-markdown-editor'
 	import slugify from 'mout/string/slugify'
-	import merge from 'mout/object/merge'
 	
 	export default {
 		mixins: [
@@ -73,44 +66,47 @@
 			return {
 				appHelpers: appStore.helpers,
 				appConfig: appStore.config,
-
-				// main form model
+				appState: appStore.state,
 				model: {
-					packageId: null,
-					version: null,
 					title: null,
-					content: null,
-					slug: null
+					slug: null,
+					content: null
 				},
-
-				contentValidator: null
+				page: null,
+				contentValidator: null,
+				createPageId: null
 			}
 		},
 		computed: {
-			packageId () {
-				return this.$route.params.id
+			packageName () {
+				return this.$route.params.packageName
 			},
 			version () {
 				return this.$route.params.version
+			},
+			packageVersionId () {
+				if (this.appState.pkg) {
+					return this.appState.pkg.packageVersionIdData.objectID
+				}
 			},
 			pageId () {
 				return this.$route.params.pageId
 			},
 			isEditView () {
-				return this.pageId
+				return this.pageId !== undefined
 			},
 			valid () {
 				return this.$validation.valid && this.contentValidator.valid
 			}
 		},
 		methods: {
-			create () {
+			save () {
 				this.didSubmit = true
 				if (this.valid) {
 					this.model.slug = slugify(this.model.title)
-					this.store.setPage(this.pageId, this.model, this.version).then((objectID) => {
-						if (!this.model.objectID) {
-							this.model.objectID = objectID
+					this.store.setPackagePage(this.packageVersionId, this.pageId, this.model).then((pageId) => {
+						if (!this.isEditView) {
+							this.createPageId = pageId
 						}
 						this.didSubmit = false
 						this.success('The page was saved.')
@@ -118,10 +114,10 @@
 				}
 			},
 			goToPackage () {
-				this.$router.go(this.appHelpers.routeToPackagePages(this.packageId, this.version))
+				this.$router.go(this.appHelpers.routeToPackagePages(this.packageName, this.version))
 			},
 			goToEditPage () {
-				this.$router.go(this.appHelpers.routeToEditPage(this.packageId, this.model.objectID, this.version))
+				this.$router.go(this.appHelpers.routeToEditPage(this.packageName, this.version, this.createPageId))
 			},
 			cancel () {
 				this.goToPackage()
@@ -129,23 +125,26 @@
 			success (message) {
 				this.alertNotificationSuccess(message)
 				if (!this.isEditView) {
-					this.goToEditPage()
+					return this.goToEditPage()
+				}
+				this.getPage()
+			},
+			getPage () {
+				if (this.isEditView) {
+					this.store.getPackagePage(this.packageName, this.version, this.pageId).then((page) => this.page = page)
 				}
 			}
 		},
 		created () {
-			const mergeModel = {
-				packageId: this.packageId,
-				version: this.version
-			}
-			if (this.isEditView) {
-				this.store.getPage(this.pageId, this.version).then((page) => {
-					this.model = merge(page, mergeModel)
-				})
-			}
-			else {
-				this.model = merge(this.model, mergeModel)
-			}
+			this.getPage()
+		},
+		watch: {
+			page (value) {
+				if (value && value.data) {
+					this.model = value.data
+				}
+			},
+			packageVersionId: 'getPage'
 		},
 		components: {
 			MarkdownEditor

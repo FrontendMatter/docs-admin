@@ -53,22 +53,22 @@ export default {
 		routeToPackageComponents (packageName, version) {
 			return routeToPackage('package.components', packageName, version)
 		},
-		routeToPackagePages (packageId, version) {
-			return routeToPackage('package.pages', packageId, version)
+		routeToPackagePages (packageName, version) {
+			return routeToPackage('package.pages', packageName, version)
 		},
-		routeToCreateComponent (packageId, version) {
-			return routeToPackage('package.create.component', packageId, version)
+		routeToCreateComponent (packageName, version) {
+			return routeToPackage('package.create.component', packageName, version)
 		},
-		routeToCreatePage (packageId, version) {
-			return routeToPackage('package.create.page', packageId, version)
+		routeToCreatePage (packageName, version) {
+			return routeToPackage('package.create.page', packageName, version)
 		},
-		routeToEditPage (packageId, pageId, version = 'latest') {
+		routeToEditPage (packageName, version = 'latest', pageId) {
 			return {
 				name: 'package.edit.page',
 				params: {
-					id: packageId,
-					pageId,
-					version
+					packageName,
+					version,
+					pageId
 				}
 			}
 		}

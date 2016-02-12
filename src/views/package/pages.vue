@@ -1,7 +1,7 @@
 <template>
 
 	<div class="page-header">
-		<button class="btn btn-primary pull-right" v-link="appHelpers.routeToCreatePage(packageId, version)">Add page</button>
+		<button class="btn btn-primary pull-right" v-link="appHelpers.routeToCreatePage(packageName, version)">Add page</button>
 		<h1>Pages</h1>
 	</div>
 
@@ -9,38 +9,29 @@
 	<div class="alert alert-default" v-if="serviceLoading">Loading ...</div>
 	
 	<!-- Display list -->
-	<isotope v-if="!serviceLoading && pages.length">
+	<isotope v-if="pages.length && !serviceLoading">
 		<isotope-item class="col-md-6" v-for="page in pages">
 			<div class="panel panel-default panel-page">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<button class="close" @click="removePage(page.objectID)">&times;</button>
-						{{ page.title }}
+						<button class="close" @click="removePage(page)">&times;</button>
+						{{ page.data.title }}
+						<span class="label toggle-version" v-if="appState.pkg" :class="{
+							'label-default': page.packageVersionId.indexOf(packageVersionId) === -1,
+							'label-success': page.packageVersionId.indexOf(packageVersionId) !== -1
+						}" @click="togglePackageVersionPage(page)">{{ page.packageVersionIdData.version }}</span>
 					</h4>
 				</div>
-				<div class="panel-body" v-link="appHelpers.routeToEditPage(packageId, page.objectID, version)">
-					{{ page.content | excerpt 100 }}
+				<div class="panel-body" v-link="appHelpers.routeToEditPage(packageName, version, page.packageVersionPageIdData.pageId)">
+					{{ page.data.content | excerpt }}
 				</div>
 			</div>
 		</isotope-item>
 	</isotope>
 	<!-- // END List -->
 
-	<!-- No components -->
-	<div class="alert alert-default" v-if="!serviceLoading && !pages.length">
-		No pages to display.
-	</div>
-
-	<nav v-if="paginator && paginator.hasResults()">
-		<ul class="pager">
-			<li :class="{ 'disabled': paginator.isFirstPage() }">
-				<a href="#" @click.stop.prevent="prevPage">Previous</a>
-			</li>
-			<li :class="{ 'disabled': paginator.isLastPage() }">
-				<a href="#" @click.stop.prevent="nextPage">Next</a>
-			</li>
-		</ul>
-	</nav>
+	<!-- No results -->
+	<div class="alert alert-default" v-if="!serviceLoading && !pages.length">No pages to display.</div>
 
 </template>
 
@@ -57,53 +48,60 @@
 			return {
 				pages: [],
 				appHelpers: appStore.helpers,
-				paginator: null
+				appState: appStore.state
 			}
 		},
 		computed: {
-			packageId () {
-				return this.$route.params.id
+			packageName () {
+				return this.$route.params.packageName
 			},
 			version () {
 				return this.$route.params.version
+			},
+			packageVersionId () {
+				if (this.appState.pkg) {
+					return this.appState.pkg.packageVersionIdData.objectID
+				}
 			}
 		},
 		methods: {
-			removePage (pageId) {
+			removePage (page) {
 				if (confirm('Are you sure you want to remove this page?')) {
-					this.store.removePage(pageId, this.version)
+					const id = page.packageVersionPageIdData.objectID
+					this.store.removePackagePage(id).then(() => this.getPages())
 				}
 			},
 			onAdded (page) {
-				let exists = this.pages.find((p) => p.objectID === page.objectID)
+				let exists = this.pages.find((p) => p.packageVersionPageIdData.objectID === page.packageVersionPageIdData.objectID)
 				if (!exists) {
 					this.pages.push(page)
 				}
 			},
-			onRemoved (objectID) {
-				this.pages = this.pages.filter((p) => p.objectID !== objectID)
+			onRemoved (packageVersionPageId) {
+				this.pages = this.pages.filter((p) => p.packageVersionPageIdData.objectID !== packageVersionPageId)
 			},
-			nextPage () {
-				if (!this.paginator || (this.paginator && !this.paginator.isLastPage())) {
-					this.store.nextPage('pages', this.version).then((pages) => {
-						this.pages = pages
-						this.paginator = this.store.paginator.pages
-					})
-				}
+			getPages () {
+				this.store.offPackagePageAdded()
+				this.store.onPackagePageAdded(this.packageName, this.version, this.onAdded)
 			},
-			prevPage () {
-				if (this.paginator && !this.paginator.isFirstPage()) {
-					this.store.prevPage('pages', this.version).then((pages) => {
-						this.pages = pages
-						this.paginator = this.store.paginator.pages
-					})
-				}
+			togglePackageVersionPage (page) {
+				this.store.togglePackageVersionPage(this.packageName, this.version, page.packageVersionPageIdData.pageId).then((updatedPage) => {
+					if (updatedPage) {
+						const index = this.pages.findIndex((p) => p.packageVersionPageIdData.pageId === updatedPage.packageVersionPageIdData.pageId)
+						this.pages.$set(index, updatedPage)
+					}
+				})
 			}
 		},
 		created () {
-			this.store.paginatePages(this.packageId, this.version)
-			this.nextPage('pages')
-			this.store.onPageRemoved(this.onRemoved)
+			this.getPages()
+			this.store.onPackageVersionPageRemoved(this.onRemoved)
+		},
+		destroyed () {
+			this.store.offPackageVersionPageRemoved()
+		},
+		watch: {
+			'appState.pkg': 'getPages'
 		},
 		components: {
 			Isotope,
@@ -113,7 +111,10 @@
 </script>
 
 <style lang="sass">
-	.panel-page .panel-body {
-		cursor: pointer;
+	.panel-page {
+		.panel-body,
+		.toggle-version {
+			cursor: pointer;
+		}
 	}
 </style>
