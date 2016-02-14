@@ -5,43 +5,47 @@ webpackJsonp([9],{
 
 	'use strict';
 
-	__webpack_require__(269);
+	__webpack_require__(293);
 
-	__webpack_require__(276);
+	__webpack_require__(300);
 
-	__webpack_require__(284);
+	__webpack_require__(308);
 
-	__webpack_require__(286);
+	__webpack_require__(310);
 
-	__webpack_require__(288);
+	__webpack_require__(312);
 
-	__webpack_require__(290);
+	__webpack_require__(314);
 
-	__webpack_require__(292);
+	__webpack_require__(316);
 
-	__webpack_require__(294);
+	__webpack_require__(318);
 
-	__webpack_require__(297);
+	__webpack_require__(321);
 
-	__webpack_require__(298);
+	__webpack_require__(322);
 
-	var _app = __webpack_require__(4);
+	var _app = __webpack_require__(20);
 
 	var _app2 = _interopRequireDefault(_app);
 
-	var _marked = __webpack_require__(218);
+	var _marked = __webpack_require__(251);
 
 	var _marked2 = _interopRequireDefault(_marked);
 
-	var _vue = __webpack_require__(165);
+	var _vue = __webpack_require__(1);
 
 	var _vue2 = _interopRequireDefault(_vue);
 
-	var _vueValidator = __webpack_require__(299);
+	var _crop = __webpack_require__(323);
+
+	var _crop2 = _interopRequireDefault(_crop);
+
+	var _vueValidator = __webpack_require__(325);
 
 	var _vueValidator2 = _interopRequireDefault(_vueValidator);
 
-	var _themekitVue = __webpack_require__(3);
+	var _themekitVue = __webpack_require__(171);
 
 	var _themekitVue2 = _interopRequireDefault(_themekitVue);
 
@@ -66,15 +70,22 @@ webpackJsonp([9],{
 
 	_marked2.default.setOptions(_app2.default.config.marked);
 
+	// Vue library
+
 	// MARKED
 
 	/*
 	 * SCRIPTS
 	 */
 
-	window.marked = _marked2.default;
+	// Marked filter
+	_vue2.default.filter('marked', _marked2.default);
 
-	// Vue library
+	// Excerpt filter
+
+	_vue2.default.filter('excerpt', function (value, length) {
+	  return (0, _crop2.default)(value, length || 100);
+	});
 
 	// vue-validator
 
@@ -86,7 +97,7 @@ webpackJsonp([9],{
 
 /***/ },
 
-/***/ 218:
+/***/ 251:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -1379,72 +1390,214 @@ webpackJsonp([9],{
 
 /***/ },
 
-/***/ 269:
+/***/ 272:
 /***/ function(module, exports) {
 
-	// removed by extract-text-webpack-plugin
+	
+
+	    /**
+	     * Typecast a value to a String, using an empty string value for null or
+	     * undefined.
+	     */
+	    function toString(val){
+	        return val == null ? '' : val.toString();
+	    }
+
+	    module.exports = toString;
+
+
+
+
+/***/ },
+
+/***/ 275:
+/***/ function(module, exports, __webpack_require__) {
+
+	var toString = __webpack_require__(272);
+	var WHITE_SPACES = __webpack_require__(276);
+	var ltrim = __webpack_require__(277);
+	var rtrim = __webpack_require__(278);
+	    /**
+	     * Remove white-spaces from beginning and end of string.
+	     */
+	    function trim(str, chars) {
+	        str = toString(str);
+	        chars = chars || WHITE_SPACES;
+	        return ltrim(rtrim(str, chars), chars);
+	    }
+
+	    module.exports = trim;
+
+
 
 /***/ },
 
 /***/ 276:
 /***/ function(module, exports) {
 
-	// removed by extract-text-webpack-plugin
+	
+	    /**
+	     * Contains all Unicode white-spaces. Taken from
+	     * http://en.wikipedia.org/wiki/Whitespace_character.
+	     */
+	    module.exports = [
+	        ' ', '\n', '\r', '\t', '\f', '\v', '\u00A0', '\u1680', '\u180E',
+	        '\u2000', '\u2001', '\u2002', '\u2003', '\u2004', '\u2005', '\u2006',
+	        '\u2007', '\u2008', '\u2009', '\u200A', '\u2028', '\u2029', '\u202F',
+	        '\u205F', '\u3000'
+	    ];
+
+
 
 /***/ },
 
-/***/ 284:
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
-
-/***/ 286:
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
-
-/***/ 288:
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
-
-/***/ 290:
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
-
-/***/ 292:
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
-
-/***/ 294:
+/***/ 277:
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["$"] = __webpack_require__(295);
+	var toString = __webpack_require__(272);
+	var WHITE_SPACES = __webpack_require__(276);
+	    /**
+	     * Remove chars from beginning of string.
+	     */
+	    function ltrim(str, chars) {
+	        str = toString(str);
+	        chars = chars || WHITE_SPACES;
+
+	        var start = 0,
+	            len = str.length,
+	            charLen = chars.length,
+	            found = true,
+	            i, c;
+
+	        while (found && start < len) {
+	            found = false;
+	            i = -1;
+	            c = str.charAt(start);
+
+	            while (++i < charLen) {
+	                if (c === chars[i]) {
+	                    found = true;
+	                    start++;
+	                    break;
+	                }
+	            }
+	        }
+
+	        return (start >= len) ? '' : str.substr(start, len);
+	    }
+
+	    module.exports = ltrim;
+
+
+
+/***/ },
+
+/***/ 278:
+/***/ function(module, exports, __webpack_require__) {
+
+	var toString = __webpack_require__(272);
+	var WHITE_SPACES = __webpack_require__(276);
+	    /**
+	     * Remove chars from end of string.
+	     */
+	    function rtrim(str, chars) {
+	        str = toString(str);
+	        chars = chars || WHITE_SPACES;
+
+	        var end = str.length - 1,
+	            charLen = chars.length,
+	            found = true,
+	            i, c;
+
+	        while (found && end >= 0) {
+	            found = false;
+	            i = -1;
+	            c = str.charAt(end);
+
+	            while (++i < charLen) {
+	                if (c === chars[i]) {
+	                    found = true;
+	                    end--;
+	                    break;
+	                }
+	            }
+	        }
+
+	        return (end >= 0) ? str.substring(0, end + 1) : '';
+	    }
+
+	    module.exports = rtrim;
+
+
+
+/***/ },
+
+/***/ 293:
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+
+/***/ 300:
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+
+/***/ 308:
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+
+/***/ 310:
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+
+/***/ 312:
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+
+/***/ 314:
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+
+/***/ 316:
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+
+/***/ 318:
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["$"] = __webpack_require__(319);
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 
-/***/ 295:
+/***/ 319:
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["jQuery"] = __webpack_require__(296);
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["jQuery"] = __webpack_require__(320);
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 
-/***/ 296:
+/***/ 320:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10661,7 +10814,7 @@ webpackJsonp([9],{
 
 /***/ },
 
-/***/ 297:
+/***/ 321:
 /***/ function(module, exports) {
 
 	/*!
@@ -13031,7 +13184,7 @@ webpackJsonp([9],{
 
 /***/ },
 
-/***/ 298:
+/***/ 322:
 /***/ function(module, exports) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -14451,27 +14604,77 @@ webpackJsonp([9],{
 
 /***/ },
 
-/***/ 299:
+/***/ 323:
+/***/ function(module, exports, __webpack_require__) {
+
+	var toString = __webpack_require__(272);
+	var truncate = __webpack_require__(324);
+	    /**
+	     * Truncate string at full words.
+	     */
+	     function crop(str, maxChars, append) {
+	         str = toString(str);
+	         return truncate(str, maxChars, append, true);
+	     }
+
+	     module.exports = crop;
+
+
+
+/***/ },
+
+/***/ 324:
+/***/ function(module, exports, __webpack_require__) {
+
+	var toString = __webpack_require__(272);
+	var trim = __webpack_require__(275);
+	    /**
+	     * Limit number of chars.
+	     */
+	    function truncate(str, maxChars, append, onlyFullWords){
+	        str = toString(str);
+	        append = append || '...';
+	        maxChars = onlyFullWords? maxChars + 1 : maxChars;
+
+	        str = trim(str);
+	        if(str.length <= maxChars){
+	            return str;
+	        }
+	        str = str.substr(0, maxChars - append.length);
+	        //crop at last space or remove trailing whitespace
+	        str = onlyFullWords? str.substr(0, str.lastIndexOf(' ')) : trim(str);
+	        return str + append;
+	    }
+	    module.exports = truncate;
+
+
+
+/***/ },
+
+/***/ 325:
 /***/ function(module, exports) {
 
 	/*!
-	 * vue-validator v2.0.0-alpha.16
+	 * vue-validator v2.0.0-alpha.18
 	 * (c) 2016 kazuya kawaguchi
 	 * Released under the MIT License.
 	 */
 	'use strict';
 
-	function babelHelpers_typeof (obj) {
-	  return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+	var babelHelpers = {};
+	babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+	  return typeof obj;
+	} : function (obj) {
+	  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
 	};
 
-	function babelHelpers_classCallCheck (instance, Constructor) {
+	babelHelpers.classCallCheck = function (instance, Constructor) {
 	  if (!(instance instanceof Constructor)) {
 	    throw new TypeError("Cannot call a class as a function");
 	  }
 	};
 
-	var babelHelpers_createClass = (function () {
+	babelHelpers.createClass = function () {
 	  function defineProperties(target, props) {
 	    for (var i = 0; i < props.length; i++) {
 	      var descriptor = props[i];
@@ -14487,9 +14690,9 @@ webpackJsonp([9],{
 	    if (staticProps) defineProperties(Constructor, staticProps);
 	    return Constructor;
 	  };
-	})();
+	}();
 
-	function babelHelpers_inherits (subClass, superClass) {
+	babelHelpers.inherits = function (subClass, superClass) {
 	  if (typeof superClass !== "function" && superClass !== null) {
 	    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
 	  }
@@ -14505,13 +14708,15 @@ webpackJsonp([9],{
 	  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 	};
 
-	function babelHelpers_possibleConstructorReturn (self, call) {
+	babelHelpers.possibleConstructorReturn = function (self, call) {
 	  if (!self) {
 	    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
 	  }
 
 	  return call && (typeof call === "object" || typeof call === "function") ? call : self;
 	};
+
+	babelHelpers;
 
 	/**
 	 * Utilties
@@ -14607,11 +14812,19 @@ webpackJsonp([9],{
 	 *
 	 * @param {Element} el
 	 * @param {String} event
+	 * @param {Object} [args]
 	 */
 
-	function trigger(el, event) {
+	function trigger(el, event, args) {
 	  var e = document.createEvent('HTMLEvents');
 	  e.initEvent(event, true, false);
+
+	  if (args) {
+	    for (var prop in args) {
+	      e[prop] = args[prop];
+	    }
+	  }
+
 	  // Due to Firefox bug, events fired on disabled
 	  // non-attached form controls can throw errors
 	  try {
@@ -14653,7 +14866,7 @@ webpackJsonp([9],{
 	    return val;
 	  } else if (typeof val === 'string') {
 	    return val.length > 0;
-	  } else if (val !== null && (typeof val === 'undefined' ? 'undefined' : babelHelpers_typeof(val)) === 'object') {
+	  } else if (val !== null && (typeof val === 'undefined' ? 'undefined' : babelHelpers.typeof(val)) === 'object') {
 	    return Object.keys(val).length > 0;
 	  } else if (val === null || val === undefined) {
 	    return false;
@@ -14911,9 +15124,17 @@ webpackJsonp([9],{
 
 	      this.onBlur = _.bind(validation.listener, validation);
 	      _.on(el, 'blur', this.onBlur);
-	      if ((el.type === 'checkbox' || el.type === 'radio' || el.tagName === 'SELECT') && !model) {
+	      if ((el.type === 'radio' || el.tagName === 'SELECT') && !model) {
 	        this.onChange = _.bind(validation.listener, validation);
 	        _.on(el, 'change', this.onChange);
+	      } else if (el.type === 'checkbox') {
+	        if (!model) {
+	          this.onChange = _.bind(validation.listener, validation);
+	          _.on(el, 'change', this.onChange);
+	        } else {
+	          this.onClick = _.bind(validation.listener, validation);
+	          _.on(el, 'click', this.onClick);
+	        }
 	      } else {
 	        if (!model) {
 	          this.onInput = _.bind(validation.listener, validation);
@@ -14927,6 +15148,11 @@ webpackJsonp([9],{
 	      if (this.onInput) {
 	        _.off(el, 'input', this.onInput);
 	        this.onInput = null;
+	      }
+
+	      if (this.onClick) {
+	        _.off(el, 'click', this.onClick);
+	        this.onClick = null;
 	      }
 
 	      if (this.onChange) {
@@ -15000,52 +15226,39 @@ webpackJsonp([9],{
 	 * BaseValidation class
 	 */
 
-	var BaseValidation = (function () {
+	var BaseValidation = function () {
 	  function BaseValidation(field, model, vm, el, scope, validator) {
-	    babelHelpers_classCallCheck(this, BaseValidation);
+	    babelHelpers.classCallCheck(this, BaseValidation);
 
 	    this.field = field;
 	    this.touched = false;
 	    this.dirty = false;
 	    this.modified = false;
 
+	    this._modified = false;
 	    this._model = model;
 	    this._validator = validator;
 	    this._vm = vm;
 	    this._el = el;
 	    this._forScope = scope;
 	    this._init = this._getValue(el);
-	    this._value = el.value;
 	    this._validators = {};
 	  }
 
-	  babelHelpers_createClass(BaseValidation, [{
-	    key: '_getValue',
-	    value: function _getValue(el) {
-	      return el.value;
-	    }
-	  }, {
-	    key: '_getScope',
-	    value: function _getScope() {
-	      return this._forScope || this._vm;
-	    }
-	  }, {
+	  babelHelpers.createClass(BaseValidation, [{
 	    key: 'manageElement',
 	    value: function manageElement(el) {
 	      var _this = this;
-
-	      var _ = exports$1.Vue.util;
 
 	      var scope = this._getScope();
 	      var model = this._model;
 	      if (model) {
 	        el.value = scope.$get(model) || '';
-	        this._unwatch = scope.$watch(model, _.bind(function (val, old) {
-	          console.log('BaseValidation#manageElement $watch', model, val, old);
+	        this._unwatch = scope.$watch(model, function (val, old) {
 	          if (val !== old) {
 	            _this.handleValidate(el);
 	          }
-	        }, this), { deep: true });
+	        }, { deep: true });
 	      }
 	    }
 	  }, {
@@ -15070,6 +15283,37 @@ webpackJsonp([9],{
 	      }
 	    }
 	  }, {
+	    key: 'willUpdateFlags',
+	    value: function willUpdateFlags() {
+	      this.willUpdateDirty(this._el);
+	      this.willUpdateModified(this._el);
+	    }
+	  }, {
+	    key: 'willUpdateTouched',
+	    value: function willUpdateTouched(el, type) {
+	      if (type && type === 'blur') {
+	        this.touched = true;
+	        this._fireEvent(el, 'touched');
+	      }
+	    }
+	  }, {
+	    key: 'willUpdateDirty',
+	    value: function willUpdateDirty(el) {
+	      if (!this.dirty && this._checkModified(el)) {
+	        this.dirty = true;
+	        this._fireEvent(el, 'dirty');
+	      }
+	    }
+	  }, {
+	    key: 'willUpdateModified',
+	    value: function willUpdateModified(el) {
+	      this.modified = this._checkModified(el);
+	      if (this._modified !== this.modified) {
+	        this._fireEvent(el, 'modified', { modified: this.modified });
+	        this._modified = this.modified;
+	      }
+	    }
+	  }, {
 	    key: 'listener',
 	    value: function listener(e) {
 	      if (e.relatedTarget && (e.relatedTarget.tagName === 'A' || e.relatedTarget.tagName === 'BUTTON')) {
@@ -15081,22 +15325,11 @@ webpackJsonp([9],{
 	  }, {
 	    key: 'handleValidate',
 	    value: function handleValidate(el, type) {
-	      if (type && type === 'blur') {
-	        this.touched = true;
-	      }
-
-	      if (!this.dirty && this._checkModified(el)) {
-	        this.dirty = true;
-	      }
-
-	      this.modified = this._checkModified(el);
+	      this.willUpdateTouched(el, type);
+	      this.willUpdateDirty(el);
+	      this.willUpdateModified(el);
 
 	      this._validator.validate();
-	    }
-	  }, {
-	    key: '_checkModified',
-	    value: function _checkModified(target) {
-	      return this._init !== this._getValue(target);
 	    }
 	  }, {
 	    key: 'validate',
@@ -15141,7 +15374,7 @@ webpackJsonp([9],{
 	        }
 	      }, this);
 
-	      this._fireEvent(this._el, valid);
+	      this._fireEvent(this._el, valid ? 'valid' : 'invalid');
 
 	      var props = {
 	        valid: valid,
@@ -15160,9 +15393,38 @@ webpackJsonp([9],{
 	      return results;
 	    }
 	  }, {
+	    key: 'resetFlags',
+	    value: function resetFlags() {
+	      this.touched = false;
+	      this.dirty = false;
+	      this.modified = false;
+	      this._modified = false;
+	    }
+	  }, {
+	    key: 'reset',
+	    value: function reset() {
+	      this.resetFlags();
+	      this._init = this._getValue(this._el);
+	    }
+	  }, {
+	    key: '_getValue',
+	    value: function _getValue(el) {
+	      return el.value;
+	    }
+	  }, {
+	    key: '_getScope',
+	    value: function _getScope() {
+	      return this._forScope || this._vm;
+	    }
+	  }, {
+	    key: '_checkModified',
+	    value: function _checkModified(target) {
+	      return this._init !== this._getValue(target);
+	    }
+	  }, {
 	    key: '_fireEvent',
-	    value: function _fireEvent(el, valid) {
-	      trigger(el, valid ? 'valid' : 'invalid');
+	    value: function _fireEvent(el, type, args) {
+	      trigger(el, type, args);
 	    }
 	  }, {
 	    key: '_resolveValidator',
@@ -15172,263 +15434,28 @@ webpackJsonp([9],{
 	    }
 	  }]);
 	  return BaseValidation;
-	})();
-
-	/**
-	 * SelectValidation class
-	 */
-
-	var SelectValidation = (function (_BaseValidation) {
-	  babelHelpers_inherits(SelectValidation, _BaseValidation);
-
-	  function SelectValidation(field, model, vm, el, scope, validator) {
-	    babelHelpers_classCallCheck(this, SelectValidation);
-
-	    var _this = babelHelpers_possibleConstructorReturn(this, Object.getPrototypeOf(SelectValidation).call(this, field, model, vm, el, scope, validator));
-
-	    _this._multiple = _this._el.hasAttribute('multiple');
-	    return _this;
-	  }
-
-	  babelHelpers_createClass(SelectValidation, [{
-	    key: '_getValue',
-	    value: function _getValue(el) {
-	      var ret = [];
-
-	      for (var i = 0, l = el.options.length; i < l; i++) {
-	        var option = el.options[i];
-	        if (!option.disabled && option.selected) {
-	          ret.push(option.value);
-	        }
-	      }
-
-	      return ret;
-	    }
-	  }, {
-	    key: '_setOption',
-	    value: function _setOption(values, el) {
-	      for (var i = 0, l = values.length; i < l; i++) {
-	        var value = values[i];
-	        for (var j = 0, m = el.options.length; j < m; j++) {
-	          var option = el.options[j];
-	          if (!option.disabled && option.value === value && (!option.hasAttribute('selected') || !option.selected)) {
-	            option.selected = true;
-	          }
-	        }
-	      }
-	    }
-	  }, {
-	    key: 'manageElement',
-	    value: function manageElement(el) {
-	      var _this2 = this;
-
-	      var _ = exports$1.Vue.util;
-
-	      var scope = this._getScope();
-	      var model = this._model;
-	      if (model) {
-	        var value = scope.$get(model);
-	        var values = !Array.isArray(value) ? [value] : value;
-	        this._setOption(values, el);
-	        this._unwatch = scope.$watch(model, _.bind(function (val, old) {
-	          var values1 = !Array.isArray(val) ? [val] : val;
-	          var values2 = !Array.isArray(old) ? [old] : old;
-	          if (values1.slice().sort().toString() !== values2.slice().sort().toString()) {
-	            _this2.handleValidate(el);
-	          }
-	        }, this));
-	      }
-	    }
-	  }, {
-	    key: 'unmanageElement',
-	    value: function unmanageElement(el) {
-	      if (this._unwatch) {
-	        this._unwatch();
-	      }
-	    }
-	  }, {
-	    key: '_checkModified',
-	    value: function _checkModified(target) {
-	      var values = this._getValue(target).slice().sort();
-	      if (this._init.length !== values.length) {
-	        return true;
-	      } else {
-	        var inits = this._init.slice().sort();
-	        return inits.toString() !== values.toString();
-	      }
-	    }
-	  }]);
-	  return SelectValidation;
-	})(BaseValidation);
-
-	/**
-	 * RadioValidation class
-	 */
-
-	var RadioValidation = (function (_BaseValidation) {
-	  babelHelpers_inherits(RadioValidation, _BaseValidation);
-
-	  function RadioValidation(field, model, vm, el, scope, validator) {
-	    babelHelpers_classCallCheck(this, RadioValidation);
-
-	    var _this = babelHelpers_possibleConstructorReturn(this, Object.getPrototypeOf(RadioValidation).call(this, field, model, vm, el, scope, validator));
-
-	    _this._inits = [];
-	    return _this;
-	  }
-
-	  babelHelpers_createClass(RadioValidation, [{
-	    key: '_addItem',
-	    value: function _addItem(el) {
-	      var item = {
-	        el: el,
-	        init: el.checked,
-	        value: el.value
-	      };
-	      this._inits.push(item);
-	      return item;
-	    }
-	  }, {
-	    key: '_setChecked',
-	    value: function _setChecked(value, el, item) {
-	      if (el.value === value) {
-	        el.checked = true;
-	        this._init = el.checked;
-	        item.init = el.checked;
-	        item.value = value;
-	      }
-	    }
-	  }, {
-	    key: 'manageElement',
-	    value: function manageElement(el) {
-	      var _this2 = this;
-
-	      var _ = exports$1.Vue.util;
-
-	      var item = this._addItem(el);
-	      var scope = this._getScope();
-	      var model = item.model = this._model;
-	      if (model) {
-	        var value = scope.$get(model);
-	        this._setChecked(value, el, item);
-	        item.unwatch = scope.$watch(model, _.bind(function (val, old) {
-	          if (val !== old) {
-	            _this2.handleValidate(el);
-	          }
-	        }, this));
-	      } else {
-	        this._validator.validate();
-	      }
-	    }
-	  }, {
-	    key: 'unmanageElement',
-	    value: function unmanageElement(el) {
-	      var found = -1;
-	      each(this._inits, function (item, index) {
-	        if (item.el === el) {
-	          found = index;
-	        }
-	      });
-	      if (found === -1) {
-	        return;
-	      }
-
-	      this._inits.splice(found, 1);
-	      this._validator.validate();
-	    }
-	  }, {
-	    key: '_getValue',
-	    value: function _getValue(el) {
-	      var _this3 = this;
-
-	      if (!this._inits || this._inits.length === 0) {
-	        return el.checked;
-	      } else {
-	        var _ret = (function () {
-	          var vals = [];
-	          each(_this3._inits, function (item, index) {
-	            if (item.el.checked) {
-	              vals.push(item.el.value);
-	            }
-	          });
-	          return {
-	            v: vals
-	          };
-	        })();
-
-	        if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers_typeof(_ret)) === "object") return _ret.v;
-	      }
-	    }
-	  }, {
-	    key: '_checkModified',
-	    value: function _checkModified(target) {
-	      var _this4 = this;
-
-	      if (this._inits.length === 0) {
-	        return this._init !== target.checked;
-	      } else {
-	        var _ret2 = (function () {
-	          var modified = false;
-	          each(_this4._inits, function (item, index) {
-	            if (!modified) {
-	              modified = item.init !== item.el.checked;
-	            }
-	          });
-	          return {
-	            v: modified
-	          };
-	        })();
-
-	        if ((typeof _ret2 === 'undefined' ? 'undefined' : babelHelpers_typeof(_ret2)) === "object") return _ret2.v;
-	      }
-	    }
-	  }]);
-	  return RadioValidation;
-	})(BaseValidation);
+	}();
 
 	/**
 	 * CheckboxValidation class
 	 */
 
-	var CheckboxValidation = (function (_BaseValidation) {
-	  babelHelpers_inherits(CheckboxValidation, _BaseValidation);
+	var CheckboxValidation = function (_BaseValidation) {
+	  babelHelpers.inherits(CheckboxValidation, _BaseValidation);
 
 	  function CheckboxValidation(field, model, vm, el, scope, validator) {
-	    babelHelpers_classCallCheck(this, CheckboxValidation);
+	    babelHelpers.classCallCheck(this, CheckboxValidation);
 
-	    var _this = babelHelpers_possibleConstructorReturn(this, Object.getPrototypeOf(CheckboxValidation).call(this, field, model, vm, el, scope, validator));
+	    var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(CheckboxValidation).call(this, field, model, vm, el, scope, validator));
 
 	    _this._inits = [];
 	    return _this;
 	  }
 
-	  babelHelpers_createClass(CheckboxValidation, [{
-	    key: '_addItem',
-	    value: function _addItem(el) {
-	      var item = {
-	        el: el,
-	        init: el.checked,
-	        value: el.value
-	      };
-	      this._inits.push(item);
-	      return item;
-	    }
-	  }, {
-	    key: '_setChecked',
-	    value: function _setChecked(values, el) {
-	      for (var i = 0, l = values.length; i < l; i++) {
-	        var value = values[i];
-	        if (!el.disabled && el.value === value && !el.checked) {
-	          el.checked = true;
-	        }
-	      }
-	    }
-	  }, {
+	  babelHelpers.createClass(CheckboxValidation, [{
 	    key: 'manageElement',
 	    value: function manageElement(el) {
 	      var _this2 = this;
-
-	      var _ = exports$1.Vue.util;
 
 	      var item = this._addItem(el);
 	      var scope = this._getScope();
@@ -15437,21 +15464,21 @@ webpackJsonp([9],{
 	        var value = scope.$get(model);
 	        if (Array.isArray(value)) {
 	          this._setChecked(value, item.el);
-	          item.unwatch = scope.$watch(model, _.bind(function (val, old) {
+	          item.unwatch = scope.$watch(model, function (val, old) {
 	            if (val !== old) {
 	              _this2.handleValidate(item.el);
 	            }
-	          }, this));
+	          });
 	        } else {
 	          el.checked = value || false;
 	          this._init = el.checked;
 	          item.init = el.checked;
 	          item.value = el.value;
-	          item.unwatch = scope.$watch(model, _.bind(function (val, old) {
+	          item.unwatch = scope.$watch(model, function (val, old) {
 	            if (val !== old) {
 	              _this2.handleValidate(el);
 	            }
-	          }, this));
+	          });
 	        }
 	      } else {
 	        this._validator.validate();
@@ -15479,16 +15506,56 @@ webpackJsonp([9],{
 	      this._validator.validate();
 	    }
 	  }, {
+	    key: 'willUpdateFlags',
+	    value: function willUpdateFlags() {
+	      var _this3 = this;
+
+	      each(this._inits, function (item, index) {
+	        _this3.willUpdateDirty(item.el);
+	        _this3.willUpdateModified(item.el);
+	      }, this);
+	    }
+	  }, {
+	    key: 'reset',
+	    value: function reset() {
+	      this.resetFlags();
+	      each(this._inits, function (item, index) {
+	        item.init = item.el.checked;
+	        item.value = item.el.value;
+	      });
+	    }
+	  }, {
+	    key: '_addItem',
+	    value: function _addItem(el) {
+	      var item = {
+	        el: el,
+	        init: el.checked,
+	        value: el.value
+	      };
+	      this._inits.push(item);
+	      return item;
+	    }
+	  }, {
+	    key: '_setChecked',
+	    value: function _setChecked(values, el) {
+	      for (var i = 0, l = values.length; i < l; i++) {
+	        var value = values[i];
+	        if (!el.disabled && el.value === value && !el.checked) {
+	          el.checked = true;
+	        }
+	      }
+	    }
+	  }, {
 	    key: '_getValue',
 	    value: function _getValue(el) {
-	      var _this3 = this;
+	      var _this4 = this;
 
 	      if (!this._inits || this._inits.length === 0) {
 	        return el.checked;
 	      } else {
-	        var _ret = (function () {
+	        var _ret = function () {
 	          var vals = [];
-	          each(_this3._inits, function (item, index) {
+	          each(_this4._inits, function (item, index) {
 	            if (item.el.checked) {
 	              vals.push(item.el.value);
 	            }
@@ -15496,22 +15563,22 @@ webpackJsonp([9],{
 	          return {
 	            v: vals
 	          };
-	        })();
+	        }();
 
-	        if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers_typeof(_ret)) === "object") return _ret.v;
+	        if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
 	      }
 	    }
 	  }, {
 	    key: '_checkModified',
 	    value: function _checkModified(target) {
-	      var _this4 = this;
+	      var _this5 = this;
 
 	      if (this._inits.length === 0) {
 	        return this._init !== target.checked;
 	      } else {
-	        var _ret2 = (function () {
+	        var _ret2 = function () {
 	          var modified = false;
-	          each(_this4._inits, function (item, index) {
+	          each(_this5._inits, function (item, index) {
 	            if (!modified) {
 	              modified = item.init !== item.el.checked;
 	            }
@@ -15519,24 +15586,258 @@ webpackJsonp([9],{
 	          return {
 	            v: modified
 	          };
-	        })();
+	        }();
 
-	        if ((typeof _ret2 === 'undefined' ? 'undefined' : babelHelpers_typeof(_ret2)) === "object") return _ret2.v;
+	        if ((typeof _ret2 === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret2)) === "object") return _ret2.v;
 	      }
 	    }
 	  }]);
 	  return CheckboxValidation;
-	})(BaseValidation);
+	}(BaseValidation);
+
+	/**
+	 * RadioValidation class
+	 */
+
+	var RadioValidation = function (_BaseValidation) {
+	  babelHelpers.inherits(RadioValidation, _BaseValidation);
+
+	  function RadioValidation(field, model, vm, el, scope, validator) {
+	    babelHelpers.classCallCheck(this, RadioValidation);
+
+	    var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(RadioValidation).call(this, field, model, vm, el, scope, validator));
+
+	    _this._inits = [];
+	    return _this;
+	  }
+
+	  babelHelpers.createClass(RadioValidation, [{
+	    key: 'manageElement',
+	    value: function manageElement(el) {
+	      var _this2 = this;
+
+	      var item = this._addItem(el);
+	      var scope = this._getScope();
+	      var model = item.model = this._model;
+	      if (model) {
+	        var value = scope.$get(model);
+	        this._setChecked(value, el, item);
+	        item.unwatch = scope.$watch(model, function (val, old) {
+	          if (val !== old) {
+	            _this2.handleValidate(el);
+	          }
+	        });
+	      } else {
+	        this._validator.validate();
+	      }
+	    }
+	  }, {
+	    key: 'unmanageElement',
+	    value: function unmanageElement(el) {
+	      var found = -1;
+	      each(this._inits, function (item, index) {
+	        if (item.el === el) {
+	          found = index;
+	        }
+	      });
+	      if (found === -1) {
+	        return;
+	      }
+
+	      this._inits.splice(found, 1);
+	      this._validator.validate();
+	    }
+	  }, {
+	    key: 'willUpdateFlags',
+	    value: function willUpdateFlags() {
+	      var _this3 = this;
+
+	      each(this._inits, function (item, index) {
+	        _this3.willUpdateDirty(item.el);
+	        _this3.willUpdateModified(item.el);
+	      }, this);
+	    }
+	  }, {
+	    key: 'reset',
+	    value: function reset() {
+	      this.resetFlags();
+	      each(this._inits, function (item, index) {
+	        item.init = item.el.checked;
+	        item.value = item.el.value;
+	      });
+	    }
+	  }, {
+	    key: '_addItem',
+	    value: function _addItem(el) {
+	      var item = {
+	        el: el,
+	        init: el.checked,
+	        value: el.value
+	      };
+	      this._inits.push(item);
+	      return item;
+	    }
+	  }, {
+	    key: '_setChecked',
+	    value: function _setChecked(value, el, item) {
+	      if (el.value === value) {
+	        el.checked = true;
+	        this._init = el.checked;
+	        item.init = el.checked;
+	        item.value = value;
+	      }
+	    }
+	  }, {
+	    key: '_getValue',
+	    value: function _getValue(el) {
+	      var _this4 = this;
+
+	      if (!this._inits || this._inits.length === 0) {
+	        return el.checked;
+	      } else {
+	        var _ret = function () {
+	          var vals = [];
+	          each(_this4._inits, function (item, index) {
+	            if (item.el.checked) {
+	              vals.push(item.el.value);
+	            }
+	          });
+	          return {
+	            v: vals
+	          };
+	        }();
+
+	        if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
+	      }
+	    }
+	  }, {
+	    key: '_checkModified',
+	    value: function _checkModified(target) {
+	      var _this5 = this;
+
+	      if (this._inits.length === 0) {
+	        return this._init !== target.checked;
+	      } else {
+	        var _ret2 = function () {
+	          var modified = false;
+	          each(_this5._inits, function (item, index) {
+	            if (!modified) {
+	              modified = item.init !== item.el.checked;
+	            }
+	          });
+	          return {
+	            v: modified
+	          };
+	        }();
+
+	        if ((typeof _ret2 === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret2)) === "object") return _ret2.v;
+	      }
+	    }
+	  }]);
+	  return RadioValidation;
+	}(BaseValidation);
+
+	/**
+	 * SelectValidation class
+	 */
+
+	var SelectValidation = function (_BaseValidation) {
+	  babelHelpers.inherits(SelectValidation, _BaseValidation);
+
+	  function SelectValidation(field, model, vm, el, scope, validator) {
+	    babelHelpers.classCallCheck(this, SelectValidation);
+
+	    var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SelectValidation).call(this, field, model, vm, el, scope, validator));
+
+	    _this._multiple = _this._el.hasAttribute('multiple');
+	    return _this;
+	  }
+
+	  babelHelpers.createClass(SelectValidation, [{
+	    key: 'manageElement',
+	    value: function manageElement(el) {
+	      var _this2 = this;
+
+	      var scope = this._getScope();
+	      var model = this._model;
+	      if (model) {
+	        var value = scope.$get(model);
+	        var values = !Array.isArray(value) ? [value] : value;
+	        this._setOption(values, el);
+	        this._unwatch = scope.$watch(model, function (val, old) {
+	          var values1 = !Array.isArray(val) ? [val] : val;
+	          var values2 = !Array.isArray(old) ? [old] : old;
+	          if (values1.slice().sort().toString() !== values2.slice().sort().toString()) {
+	            _this2.handleValidate(el);
+	          }
+	        });
+	      }
+	    }
+	  }, {
+	    key: 'unmanageElement',
+	    value: function unmanageElement(el) {
+	      if (this._unwatch) {
+	        this._unwatch();
+	      }
+	    }
+	  }, {
+	    key: 'reset',
+	    value: function reset() {
+	      this.resetFlags();
+	    }
+	  }, {
+	    key: '_getValue',
+	    value: function _getValue(el) {
+	      var ret = [];
+
+	      for (var i = 0, l = el.options.length; i < l; i++) {
+	        var option = el.options[i];
+	        if (!option.disabled && option.selected) {
+	          ret.push(option.value);
+	        }
+	      }
+
+	      return ret;
+	    }
+	  }, {
+	    key: '_setOption',
+	    value: function _setOption(values, el) {
+	      for (var i = 0, l = values.length; i < l; i++) {
+	        var value = values[i];
+	        for (var j = 0, m = el.options.length; j < m; j++) {
+	          var option = el.options[j];
+	          if (!option.disabled && option.value === value && (!option.hasAttribute('selected') || !option.selected)) {
+	            option.selected = true;
+	          }
+	        }
+	      }
+	    }
+	  }, {
+	    key: '_checkModified',
+	    value: function _checkModified(target) {
+	      var values = this._getValue(target).slice().sort();
+	      if (this._init.length !== values.length) {
+	        return true;
+	      } else {
+	        var inits = this._init.slice().sort();
+	        return inits.toString() !== values.toString();
+	      }
+	    }
+	  }]);
+	  return SelectValidation;
+	}(BaseValidation);
+
+	var eventRE = /^v-on:|^@/;
 
 	/**
 	 * Validator class
 	 */
 
-	var Validator$1 = (function () {
+	var Validator$1 = function () {
 	  function Validator(name, dir, groups) {
 	    var _this = this;
 
-	    babelHelpers_classCallCheck(this, Validator);
+	    babelHelpers.classCallCheck(this, Validator);
 
 	    this.name = name;
 
@@ -15547,23 +15848,107 @@ webpackJsonp([9],{
 	    this._radioValidations = {};
 	    this._groups = groups;
 	    this._groupValidations = {};
+	    this._events = {};
+	    this._modified = false;
 
 	    each(groups, function (group) {
 	      _this._groupValidations[group] = [];
 	    }, this);
 	  }
 
-	  babelHelpers_createClass(Validator, [{
+	  babelHelpers.createClass(Validator, [{
 	    key: 'enableReactive',
 	    value: function enableReactive() {
+	      var _this2 = this;
+
+	      // define the validation scope
 	      exports$1.Vue.util.defineReactive(this._dir.vm, this.name, this._scope);
 	      this._dir.vm._validatorMaps[this.name] = this;
+
+	      // define the validation reset meta method to vue instance
+	      this._dir.vm.$validatorReset = function () {
+	        _this2.resetValidation();
+	      };
+
+	      // define the validate manually meta method to vue instance
+	      this._dir.vm.$validate = function (field) {
+	        _this2._validate(field);
+	      };
 	    }
 	  }, {
 	    key: 'disableReactive',
 	    value: function disableReactive() {
+	      this._dir.vm.$validate = null;
+	      this._dir.vm.$validatorReset = null;
 	      this._dir.vm._validatorMaps[this.name] = null;
 	      this._dir.vm[this.name] = null;
+	    }
+	  }, {
+	    key: 'registerEvents',
+	    value: function registerEvents() {
+	      var attrs = this._dir.el.attributes;
+	      for (var i = 0, l = attrs.length; i < l; i++) {
+	        var event = attrs[i].name;
+	        if (eventRE.test(event)) {
+	          event = event.replace(eventRE, '');
+	          this._events[this._getEventName(event)] = this._dir.vm.$eval(attrs[i].value, true);
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'unregisterEvents',
+	    value: function unregisterEvents() {
+	      var _this3 = this;
+
+	      each(this._events, function (handler, event) {
+	        _this3._events[event] = null;
+	        delete _this3._events[event];
+	      }, this);
+	    }
+	  }, {
+	    key: '_validate',
+	    value: function _validate(field) {
+	      var validation = this._validations[field];
+	      if (!validation && this._checkboxValidations[field]) {
+	        validation = this._checkboxValidations[field].validation;
+	      } else if (!validation && this._radioValidations[field]) {
+	        validation = this._radioValidations[field].validation;
+	      }
+
+	      if (validation) {
+	        validation.willUpdateFlags();
+	        var res = validation.validate();
+	        exports$1.Vue.set(this._scope, field, res);
+
+	        if (this._scope.dirty) {
+	          this._fireEvent('dirty');
+	        }
+
+	        if (this._modified !== this._scope.modified) {
+	          this._fireEvent('modified', this._scope.modified);
+	          this._modified = this._scope.modified;
+	        }
+
+	        var valid = this._scope.valid;
+	        this._fireEvent(valid ? 'valid' : 'invalid');
+	      }
+	    }
+	  }, {
+	    key: 'resetValidation',
+	    value: function resetValidation() {
+	      each(this._validations, function (validation, key) {
+	        validation.reset();
+	      }, this);
+
+	      each(this._checkboxValidations, function (dataset, key) {
+	        dataset.validation.reset();
+	      }, this);
+
+	      each(this._radioValidations, function (dataset, key) {
+	        dataset.validation.reset();
+	      }, this);
+
+	      this.validate();
 	    }
 
 	    // TODO: should be improved performance (use cache)
@@ -15715,43 +16100,57 @@ webpackJsonp([9],{
 	  }, {
 	    key: 'validate',
 	    value: function validate(validation) {
-	      var _this2 = this;
+	      var _this4 = this;
 
 	      each(this._validations, function (validation, key) {
 	        var res = validation.validate();
-	        exports$1.Vue.set(_this2._scope, key, res);
+	        exports$1.Vue.set(_this4._scope, key, res);
 	      }, this);
 
 	      each(this._checkboxValidations, function (dataset, key) {
 	        var res = dataset.validation.validate();
-	        exports$1.Vue.set(_this2._scope, key, res);
+	        exports$1.Vue.set(_this4._scope, key, res);
 	      }, this);
 
 	      each(this._radioValidations, function (dataset, key) {
 	        var res = dataset.validation.validate();
-	        exports$1.Vue.set(_this2._scope, key, res);
+	        exports$1.Vue.set(_this4._scope, key, res);
 	      }, this);
+
+	      if (this._scope.touched) {
+	        this._fireEvent('touched');
+	      }
+
+	      if (this._scope.dirty) {
+	        this._fireEvent('dirty');
+	      }
+
+	      if (this._modified !== this._scope.modified) {
+	        this._fireEvent('modified', this._scope.modified);
+	        this._modified = this._scope.modified;
+	      }
+
+	      var valid = this._scope.valid;
+	      this._fireEvent(valid ? 'valid' : 'invalid');
 	    }
 	  }, {
 	    key: 'setupScope',
 	    value: function setupScope() {
-	      var _this3 = this;
+	      var _this5 = this;
 
-	      var bind = exports$1.Vue.util.bind;
-
-	      var validationsGetter = bind(function () {
-	        return _this3.validations;
-	      }, this);
-	      var scopeGetter = bind(function () {
-	        return _this3._scope;
-	      }, this);
+	      var validationsGetter = function validationsGetter() {
+	        return _this5.validations;
+	      };
+	      var scopeGetter = function scopeGetter() {
+	        return _this5._scope;
+	      };
 	      this._defineProperties(validationsGetter, scopeGetter);
 
 	      each(this._groups, function (name) {
-	        var validations = _this3._groupValidations[name];
+	        var validations = _this5._groupValidations[name];
 	        var group = {};
-	        exports$1.Vue.set(_this3._scope, name, group);
-	        _this3._defineProperties(function () {
+	        exports$1.Vue.set(_this5._scope, name, group);
+	        _this5._defineProperties(function () {
 	          return validations;
 	        }, function () {
 	          return group;
@@ -15770,9 +16169,25 @@ webpackJsonp([9],{
 	      };
 	    }
 	  }, {
+	    key: '_fireEvent',
+	    value: function _fireEvent(type) {
+	      var handler = this._events[this._getEventName(type)];
+
+	      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	        args[_key - 1] = arguments[_key];
+	      }
+
+	      handler && handler.apply(null, args);
+	    }
+	  }, {
+	    key: '_getEventName',
+	    value: function _getEventName(type) {
+	      return this.name + ':' + type;
+	    }
+	  }, {
 	    key: '_defineProperties',
 	    value: function _defineProperties(validationsGetter, targetGetter) {
-	      var _this4 = this;
+	      var _this6 = this;
 
 	      var bind = exports$1.Vue.util.bind;
 
@@ -15790,7 +16205,7 @@ webpackJsonp([9],{
 	          enumerable: true,
 	          configurable: true,
 	          get: function get() {
-	            return bind(descriptor.fn, _this4)(descriptor.arg);
+	            return bind(descriptor.fn, _this6)(descriptor.arg);
 	          }
 	        });
 	      }, this);
@@ -15798,7 +16213,7 @@ webpackJsonp([9],{
 	  }, {
 	    key: '_walkValidations',
 	    value: function _walkValidations(validations, property, condition) {
-	      var _this5 = this;
+	      var _this7 = this;
 
 	      var hasOwn = exports$1.Vue.util.hasOwn;
 	      var ret = condition;
@@ -15807,8 +16222,8 @@ webpackJsonp([9],{
 	        if (ret === !condition) {
 	          return;
 	        }
-	        if (hasOwn(_this5._scope, validation.field)) {
-	          var target = _this5._scope[validation.field];
+	        if (hasOwn(_this7._scope, validation.field)) {
+	          var target = _this7._scope[validation.field];
 	          if (target && target[property] === !condition) {
 	            ret = !condition;
 	          }
@@ -15855,15 +16270,15 @@ webpackJsonp([9],{
 	  }, {
 	    key: '_defineMessages',
 	    value: function _defineMessages(validationsGetter) {
-	      var _this6 = this;
+	      var _this8 = this;
 
 	      var extend = exports$1.Vue.util.extend;
 	      var hasOwn = exports$1.Vue.util.hasOwn;
 	      var ret = {};
 
 	      each(validationsGetter(), function (validation, key) {
-	        if (hasOwn(_this6._scope, validation.field)) {
-	          var target = _this6._scope[validation.field];
+	        if (hasOwn(_this8._scope, validation.field)) {
+	          var target = _this8._scope[validation.field];
 	          if (target && !empty(target['messages'])) {
 	            ret[validation.field] = extend({}, target['messages']);
 	          }
@@ -15892,35 +16307,41 @@ webpackJsonp([9],{
 	    }
 	  }]);
 	  return Validator;
-	})();
+	}();
 
 	function Validator (Vue) {
 	  var _ = Vue.util;
 	  var FragmentFactory = Vue.FragmentFactory;
 	  var vIf = Vue.directive('if');
-	  var _bind = Vue.util.bind;
 	  var camelize = Vue.util.camelize;
 
 	  Vue.elementDirective('validator', {
 	    params: ['name', 'groups', 'lazy'],
 
 	    bind: function bind() {
-	      var _this = this;
-
 	      if (!this.params.name) {
 	        // TODO: should be implemented validator:bind name params nothing error'
 	        warn('TODO: should be implemented validator:bind name params nothing error');
 	        return;
 	      }
 
-	      var validatorName = this.validatorName = '$' + camelize(this.params.name);
+	      this.validatorName = '$' + camelize(this.params.name);
 	      if (!this.vm._validatorMaps) {
 	        // TODO: should be implemented error message'
 	        warn('TODO: should be implemented error message');
 	        return;
 	      }
 
+	      this.setupValidator();
+	      this.setupFragment(this.params.lazy);
+	    },
+	    unbind: function unbind() {
+	      this.teardownFragment();
+	      this.teardownValidator();
+	    },
+	    getGroups: function getGroups() {
 	      var groups = [];
+
 	      if (this.params.groups) {
 	        if (_.isArray(this.params.groups)) {
 	          groups = this.params.groups;
@@ -15929,38 +16350,42 @@ webpackJsonp([9],{
 	        }
 	      }
 
-	      var validator = this.validator = new Validator$1(validatorName, this, groups);
+	      return groups;
+	    },
+	    setupValidator: function setupValidator() {
+	      var validator = this.validator = new Validator$1(this.validatorName, this, this.getGroups());
 	      validator.enableReactive();
 	      validator.setupScope();
-
-	      validator.waitFor(_bind(function () {
-	        _this.render(validator, validatorName);
-	        validator.validate();
-	      }, this));
-
-	      if (!this.params.lazy) {
-	        this.vm.$activateValidator();
-	      }
+	      validator.registerEvents();
 	    },
-	    render: function render(validator, validatorName) {
-	      this.anchor = _.createAnchor('vue-validator');
-	      _.replace(this.el, this.anchor);
-	      this.insert(validatorName);
-	    },
-	    insert: function insert(name) {
-	      _.extend(this.vm.$options, { _validator: name });
-	      this.factory = new FragmentFactory(this.vm, this.el.innerHTML);
-	      vIf.insert.call(this);
-	    },
-	    unbind: function unbind() {
-	      vIf.unbind.call(this);
-
+	    teardownValidator: function teardownValidator() {
+	      this.validator.unregisterEvents();
 	      this.validator.disableReactive();
 
 	      if (this.validatorName) {
 	        this.validatorName = null;
 	        this.validator = null;
 	      }
+	    },
+	    setupFragment: function setupFragment(lazy) {
+	      var _this = this;
+
+	      this.validator.waitFor(function () {
+	        _this.anchor = _.createAnchor('vue-validator');
+	        _.replace(_this.el, _this.anchor);
+	        _.extend(_this.vm.$options, { _validator: _this.validatorName });
+	        _this.factory = new FragmentFactory(_this.vm, _this.el.innerHTML);
+	        vIf.insert.call(_this);
+
+	        _this.validator.validate();
+	      });
+
+	      if (!lazy) {
+	        this.vm.$activateValidator();
+	      }
+	    },
+	    teardownFragment: function teardownFragment() {
+	      vIf.unbind.call(this);
 	    }
 	  });
 	}
@@ -15988,7 +16413,7 @@ webpackJsonp([9],{
 	  Validate(Vue);
 	}
 
-	plugin.version = '2.0.0-alpha.16';
+	plugin.version = '2.0.0-alpha.18';
 
 	if (typeof window !== 'undefined' && window.Vue) {
 	  window.Vue.use(plugin);
