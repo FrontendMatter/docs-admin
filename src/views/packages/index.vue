@@ -22,10 +22,6 @@
 					<span class="label label-default">{{ package.packageVersionIdData.version }}</span>
 					<template v-if="package.description">{{ package.description.data | excerpt }}</template>
 				</div>
-				<hr>
-				<div class="panel-body text-center" v-link="appHelpers.routeToPackageComponents(package.packageIdData.packageName, package.packageVersionIdData.version)">
-					<strong>{{ package.components }}</strong> components
-				</div>
 			</div>
 		</isotope-item>
 	</isotope>

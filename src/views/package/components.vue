@@ -110,6 +110,7 @@
 			this.store.onComponentVersionRemoved(this.onRemoved)
 		},
 		destroyed () {
+			this.store.offComponentVersionRemoved()
 			if (this.appState.pkg) {
 				this.store.offPackageVersionComponentAdded(this.appState.pkg.packageVersionIdData.objectID)
 			}
